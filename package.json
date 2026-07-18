@@ -56,7 +56,8 @@
       {
         "provider": "github",
         "owner": "Fooxo-jpg",
-        "repo": "MAPUA-Grade-Manager"
+        "repo": "MAPUA-Grade-Manager",
+        "releaseType": "release"
       }
     ]
   }
