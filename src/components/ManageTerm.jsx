@@ -31,7 +31,7 @@ export default function ManageTerm({ data, toggleCourseInTerm }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
         <Eyebrow>Manage Term</Eyebrow>
-        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: '#22392D' }}>Assign Courses to Terms</h1>
+        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>Assign Courses to Terms</h1>
       </div>
 
       {data.terms.length === 0 ? (
@@ -53,18 +53,18 @@ export default function ManageTerm({ data, toggleCourseInTerm }) {
                   className="gt-card"
                   style={{
                     textAlign: 'left', padding: 12, cursor: 'pointer',
-                    border: isSelected ? '2px solid #2D5240' : '1.5px solid #E3DCC9',
-                    background: isSelected ? '#EFF3EC' : '#FCFBF7',
+                    border: isSelected ? '2px solid var(--c-forest)' : '1.5px solid var(--c-border)',
+                    background: isSelected ? 'var(--c-surface-selected)' : 'var(--c-surface)',
                     opacity: ended ? 0.75 : 1,
                   }}
                 >
-                  <div className="gt-serif" style={{ fontSize: 15, color: '#2A2E28', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div className="gt-serif" style={{ fontSize: 15, color: 'var(--c-ink-soft)', display: 'flex', alignItems: 'center', gap: 6 }}>
                     {t.name}
-                    {isCurrent && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B8860B', display: 'inline-block' }} />}
-                    {ended && <Lock size={11} style={{ color: '#B0AA98' }} />}
+                    {isCurrent && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--c-gold)', display: 'inline-block' }} />}
+                    {ended && <Lock size={11} style={{ color: 'var(--c-text-placeholder)' }} />}
                   </div>
-                  <div className="gt-mono" style={{ fontSize: 11, color: '#8A8A7E', marginTop: 2 }}>{formatDate(t.startDate)} – {formatDate(t.endDate)}</div>
-                  <div className="gt-mono" style={{ fontSize: 10.5, color: tOverLimit ? '#B23A2E' : '#8A8A7E', marginTop: 4, fontWeight: tOverLimit ? 700 : 400 }}>
+                  <div className="gt-mono" style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>{formatDate(t.startDate)} – {formatDate(t.endDate)}</div>
+                  <div className="gt-mono" style={{ fontSize: 10.5, color: tOverLimit ? 'var(--c-danger)' : 'var(--c-text-faint)', marginTop: 4, fontWeight: tOverLimit ? 700 : 400 }}>
                     {tUnits}{tLimit !== null ? ` / ${tLimit}` : ''} unit{tUnits == 1 ? '' : 's'}
                   </div>
                 </button>
@@ -82,19 +82,19 @@ export default function ManageTerm({ data, toggleCourseInTerm }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Sort</span>
+                      <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Sort</span>
                       <select
                         value={typeFilter}
                         onChange={e => setTypeFilter(e.target.value)}
                         className="gt-mono"
-                        style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 12.5, background: '#FCFBF7', color: '#2A2E28' }}
+                        style={{ padding: '7px 10px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 12.5, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                       >
                         <option value="all">All Types</option>
                         {COURSE_TYPE_ORDER.map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
                     </label>
                     {locked && (
-                      <span className="gt-mono" style={{ fontSize: 11.5, display: 'inline-flex', alignItems: 'center', gap: 6, color: '#8A6A0D', background: '#F5E7BE', padding: '4px 10px', borderRadius: 20, fontWeight: 700 }}>
+                      <span className="gt-mono" style={{ fontSize: 11.5, display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--c-gold-dark)', background: 'var(--c-gold-tint)', padding: '4px 10px', borderRadius: 20, fontWeight: 700 }}>
                         <Lock size={12} /> Term ended — locked
                       </span>
                     )}
@@ -105,15 +105,15 @@ export default function ManageTerm({ data, toggleCourseInTerm }) {
                       title={unitLimit !== null ? `This term is capped at ${unitLimit} units` : ''}
                       style={{
                         fontSize: 11.5, fontWeight: 700, padding: '4px 10px', borderRadius: 20,
-                        color: atOrOverLimit ? '#B23A2E' : '#2D5240',
+                        color: atOrOverLimit ? 'var(--c-danger)' : 'var(--c-forest)',
                         background: atOrOverLimit ? 'rgba(178,58,46,0.1)' : 'rgba(45,82,64,0.08)',
                       }}
                     >
                       {assignedUnits}{unitLimit !== null ? ` / ${unitLimit}` : ''} unit{assignedUnits == 1 ? '' : 's'}
                     </span>
                     {selectedStats && selectedStats.gwa !== null && (
-                      <span className="gt-mono" style={{ fontSize: 12, color: '#8A8A7E' }}>
-                        {selectedStats.unitsConsidered} unit{selectedStats.unitsConsidered == 1 ? '' : 's'} considered · Term GWA: <strong style={{ color: '#B8860B', fontSize: 14 }}>{selectedStats.gwa.toFixed(2)}</strong>
+                      <span className="gt-mono" style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>
+                        {selectedStats.unitsConsidered} unit{selectedStats.unitsConsidered == 1 ? '' : 's'} considered · Term GWA: <strong style={{ color: 'var(--c-gold)', fontSize: 14 }}>{selectedStats.gwa.toFixed(2)}</strong>
                       </span>
                     )}
                   </div>
@@ -137,7 +137,7 @@ export default function ManageTerm({ data, toggleCourseInTerm }) {
                           key={c.id}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', flexWrap: 'wrap',
-                            borderBottom: i < visibleCourses.length - 1 ? '1px solid #EEE9DB' : 'none',
+                            borderBottom: i < visibleCourses.length - 1 ? '1px solid var(--c-divider)' : 'none',
                             opacity: wouldExceed ? 0.55 : 1,
                           }}
                         >
@@ -147,22 +147,22 @@ export default function ManageTerm({ data, toggleCourseInTerm }) {
                             disabled={rowDisabled}
                             title={wouldExceed ? `Would exceed the ${unitLimit}-unit cap for this term` : ''}
                             onChange={() => !rowDisabled && toggleCourseInTerm(selectedTerm.id, c.id)}
-                            style={{ width: 17, height: 17, accentColor: '#2D5240', cursor: rowDisabled ? 'not-allowed' : 'pointer' }}
+                            style={{ width: 17, height: 17, accentColor: 'var(--c-forest)', cursor: rowDisabled ? 'not-allowed' : 'pointer' }}
                           />
                           <div style={{ width: 8, height: 8, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
                           <div className="gt-mono" style={{ fontSize: 12, fontWeight: 700, color: c.color, minWidth: 60 }}>{c.code}</div>
                           <div style={{ flex: 1, minWidth: 120, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: 14, color: '#2A2E28' }}>{c.name}</span>
+                            <span style={{ fontSize: 14, color: 'var(--c-ink-soft)' }}>{c.name}</span>
                             {c.courseType && (
                               <span className="gt-mono" style={{
                                 fontSize: 9.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700,
                                 padding: '2px 7px', borderRadius: 20,
-                                color: typeMeta ? typeMeta.color : '#7C8A80',
+                                color: typeMeta ? typeMeta.color : 'var(--c-text-muted)',
                                 background: 'rgba(0,0,0,0.04)',
                               }}>{c.courseType}</span>
                             )}
                             {wouldExceed && (
-                              <span className="gt-mono" style={{ fontSize: 9.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700, color: '#B23A2E', background: 'rgba(178,58,46,0.1)', padding: '2px 7px', borderRadius: 20 }}>
+                              <span className="gt-mono" style={{ fontSize: 9.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--c-danger)', background: 'rgba(178,58,46,0.1)', padding: '2px 7px', borderRadius: 20 }}>
                                 Exceeds cap
                               </span>
                             )}

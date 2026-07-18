@@ -22,27 +22,27 @@ function ScheduleGrid({ entries, courses }) {
         <div className="gt-sched-grid" style={{ display: 'grid', gridTemplateColumns: '54px repeat(7, minmax(110px, 1fr))', minWidth: 820 }}>
           <div />
           {DAYS.map(d => (
-            <div key={d} className="gt-mono" style={{ textAlign: 'center', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600, paddingBottom: 8 }}>
+            <div key={d} className="gt-mono" style={{ textAlign: 'center', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, paddingBottom: 8 }}>
               {d.slice(0, 3)}
             </div>
           ))}
 
           <div style={{ position: 'relative', height }}>
             {hours.map(h => (
-              <div key={h} className="gt-mono" style={{ position: 'absolute', top: (h - startHour) * 60 * pxPerMin - 6, fontSize: 10.5, color: '#B0AA98' }}>
+              <div key={h} className="gt-mono" style={{ position: 'absolute', top: (h - startHour) * 60 * pxPerMin - 6, fontSize: 10.5, color: 'var(--c-text-placeholder)' }}>
                 {h % 12 === 0 ? 12 : h % 12}{h >= 12 ? 'p' : 'a'}
               </div>
             ))}
           </div>
 
           {DAYS.map(day => (
-            <div key={day} style={{ position: 'relative', height, borderLeft: '1px solid #EEE9DB' }}>
+            <div key={day} style={{ position: 'relative', height, borderLeft: '1px solid var(--c-divider)' }}>
               {hours.map(h => (
-                <div key={h} style={{ position: 'absolute', top: (h - startHour) * 60 * pxPerMin, width: '100%', borderTop: '1px solid #F4F1E6' }} />
+                <div key={h} style={{ position: 'absolute', top: (h - startHour) * 60 * pxPerMin, width: '100%', borderTop: '1px solid var(--c-bg-alt)' }} />
               ))}
               {entries.filter(e => e.day === day).map(e => {
                 const course = courses.find(c => c.id === e.courseId);
-                const entryColor = e.color || (course ? course.color : '#999');
+                const entryColor = e.color || (course ? course.color : 'var(--c-text-placeholder)');
                 const top = (timeToMinutes(e.startTime) - startHour * 60) * pxPerMin;
                 const h = Math.max((timeToMinutes(e.endTime) - timeToMinutes(e.startTime)) * pxPerMin, 20);
                 const isSelected = e.id === selectedId;
@@ -54,7 +54,7 @@ function ScheduleGrid({ entries, courses }) {
                       position: 'absolute', top, height: h, left: 2, right: 2, borderRadius: 6,
                       background: entryColor, color: '#fff', padding: '3px 6px',
                       fontSize: 10.5, overflow: 'hidden', lineHeight: 1.25, cursor: 'pointer',
-                      boxShadow: isSelected ? '0 0 0 2px #22392D' : 'none',
+                      boxShadow: isSelected ? '0 0 0 2px var(--c-forest-dark)' : 'none',
                     }}
                   >
                     <div className="gt-mono" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -84,16 +84,16 @@ function ScheduleGrid({ entries, courses }) {
       {selected && (
         <div className="gt-sched-popover">
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: selected.color || (selectedCourse ? selectedCourse.color : '#999'), flexShrink: 0, marginTop: 5 }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: selected.color || (selectedCourse ? selectedCourse.color : 'var(--c-text-placeholder)'), flexShrink: 0, marginTop: 5 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14.5, fontWeight: 600, color: '#22392D', overflowWrap: 'break-word' }}>{selectedCourse ? selectedCourse.name : 'Unknown Course'}</div>
-              <div className="gt-mono" style={{ fontSize: 11.5, color: '#8A8A7E' }}>{selectedCourse ? selectedCourse.code : ''}</div>
+              <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-forest-dark)', overflowWrap: 'break-word' }}>{selectedCourse ? selectedCourse.name : 'Unknown Course'}</div>
+              <div className="gt-mono" style={{ fontSize: 11.5, color: 'var(--c-text-faint)' }}>{selectedCourse ? selectedCourse.code : ''}</div>
             </div>
             <IconButton icon={X} onClick={() => setSelectedId(null)} title="Close" />
           </div>
-          <div className="gt-mono" style={{ fontSize: 12.5, color: '#4A5048' }}>{selected.day} · {formatTime(selected.startTime)} – {formatTime(selected.endTime)}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#4A5048' }}>
-            {selectedOnline ? <Video size={13} /> : <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#B0AA98' }} />}
+          <div className="gt-mono" style={{ fontSize: 12.5, color: 'var(--c-text)' }}>{selected.day} · {formatTime(selected.startTime)} – {formatTime(selected.endTime)}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--c-text)' }}>
+            {selectedOnline ? <Video size={13} /> : <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: 'var(--c-text-placeholder)' }} />}
             {selected.room ? selected.room : selectedOnline ? 'Online' : 'No room set'}
           </div>
           {selectedOnline && selected.meetingLink && (
@@ -102,7 +102,7 @@ function ScheduleGrid({ entries, courses }) {
               target="_blank"
               rel="noreferrer"
               className="gt-mono"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#3B5BA9', textDecoration: 'none', fontWeight: 600 }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--c-link)', textDecoration: 'none', fontWeight: 600 }}
             >
               <Video size={13} /> Join meeting
             </a>
@@ -126,9 +126,9 @@ function DayChips({ selected, onToggle }) {
             className="gt-mono"
             style={{
               padding: '8px 10px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              border: isOn ? '1.5px solid #2D5240' : '1.5px solid #DDD6C4',
-              background: isOn ? '#2D5240' : '#FCFBF7',
-              color: isOn ? '#F5F7F3' : '#4A5048',
+              border: isOn ? '1.5px solid var(--c-forest)' : '1.5px solid var(--c-border-strong)',
+              background: isOn ? 'var(--c-forest)' : 'var(--c-surface)',
+              color: isOn ? 'var(--c-on-forest)' : 'var(--c-text)',
             }}
           >
             {d.slice(0, 3)}
@@ -287,7 +287,7 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
       endTime: e.endTime,
       room: e.room,
       meetingLink: e.meetingLink,
-      color: e.color || (course ? course.color : '#999'),
+      color: e.color || (course ? course.color : 'var(--c-text-placeholder)'),
       members: members.slice().sort((a, b) => DAYS.indexOf(a.day) - DAYS.indexOf(b.day)),
     });
   });
@@ -305,7 +305,7 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
         <Eyebrow>Manage Schedule</Eyebrow>
-        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: '#22392D' }}>
+        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>
           {currentTerm ? currentTerm.name : 'No Active Term'}
         </h1>
       </div>
@@ -331,12 +331,12 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                   <select
                     value={courseId}
                     onChange={e => setCourseId(e.target.value)}
-                    style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 14, background: '#FCFBF7', color: '#2A2E28' }}
+                    style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                   >
                     {termCourses.map(c => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}
                   </select>
                 </label>
-                <div style={{ fontSize: 12, color: '#8A8A7E' }}>
+                <div style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>
                   All time blocks below are for this course. Add another time to give it a different day/time, room, or color.
                 </div>
               </div>
@@ -359,20 +359,20 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                       <TextField label="Room" value={b.room} onChange={v => updateBlock(b.key, { room: v })} placeholder='e.g. Rm 204 or "Online"' />
                     </div>
                     {timeError && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#B23A2E' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--c-danger)' }}>
                         <AlertCircle size={14} /> {timeError}
                       </div>
                     )}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>
+                      <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>
                         Days {b.days.length > 0 && `(${b.days.length} selected)`}
                       </span>
                       <DayChips selected={b.days} onToggle={day => toggleDay(b.key, day)} />
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Color</span>
+                      <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Color</span>
                       <ColorSwatchPicker value={b.color} onChange={v => updateBlock(b.key, { color: v })} />
                     </div>
 
@@ -390,14 +390,14 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
               })}
 
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-                <PrimaryButton onClick={addBlock} icon={Plus} style={{ background: '#FCFBF7', color: '#2D5240', border: '1.5px solid #DDD6C4' }}>
+                <PrimaryButton onClick={addBlock} icon={Plus} style={{ background: 'var(--c-surface)', color: 'var(--c-forest)', border: '1.5px solid var(--c-border-strong)' }}>
                   Add Another Time
                 </PrimaryButton>
                 <PrimaryButton onClick={submit} icon={Check} style={!canSubmit ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}>
                   Add to Schedule
                 </PrimaryButton>
                 {invalidBlocks.length > 0 && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#B23A2E' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--c-danger)' }}>
                     <AlertCircle size={14} /> Fix the invalid time range above before adding.
                   </span>
                 )}
@@ -433,20 +433,20 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                           <TextField label="Room" value={editDraft.room} onChange={v => updateEditDraft({ room: v })} placeholder='e.g. Rm 204 or "Online"' />
                         </div>
                         {editTimeError && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#B23A2E' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--c-danger)' }}>
                             <AlertCircle size={14} /> {editTimeError}
                           </div>
                         )}
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>
+                          <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>
                             Days {editDraft.days.length > 0 && `(${editDraft.days.length} selected)`}
                           </span>
                           <DayChips selected={editDraft.days} onToggle={toggleEditDay} />
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Color</span>
+                          <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Color</span>
                           <ColorSwatchPicker value={editDraft.color} onChange={v => updateEditDraft({ color: v })} />
                         </div>
 
@@ -468,7 +468,7 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                           >
                             Save Changes
                           </PrimaryButton>
-                          <PrimaryButton onClick={cancelEdit} style={{ background: '#FCFBF7', color: '#4A5048', border: '1.5px solid #DDD6C4' }}>
+                          <PrimaryButton onClick={cancelEdit} style={{ background: 'var(--c-surface)', color: 'var(--c-text)', border: '1.5px solid var(--c-border-strong)' }}>
                             Cancel
                           </PrimaryButton>
                         </div>
@@ -478,18 +478,18 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
 
                   return (
                     <div key={g.key} className="gt-card" style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-                      <div className="gt-mono" style={{ fontSize: 12, minWidth: 110, color: '#4A5048', fontWeight: 600 }}>{dayLabel}</div>
-                      <div className="gt-mono" style={{ fontSize: 12.5, minWidth: 140, color: '#4A5048' }}>{formatTime(g.startTime)} – {formatTime(g.endTime)}</div>
+                      <div className="gt-mono" style={{ fontSize: 12, minWidth: 110, color: 'var(--c-text)', fontWeight: 600 }}>{dayLabel}</div>
+                      <div className="gt-mono" style={{ fontSize: 12.5, minWidth: 140, color: 'var(--c-text)' }}>{formatTime(g.startTime)} – {formatTime(g.endTime)}</div>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: g.color, flexShrink: 0 }} />
-                      <div style={{ fontSize: 14, color: '#2A2E28', flex: 1, minWidth: 120 }}>{course ? course.name : 'Unknown'}</div>
-                      {g.room && <div style={{ fontSize: 12.5, color: '#8A8A7E' }}>{g.room}</div>}
+                      <div style={{ fontSize: 14, color: 'var(--c-ink-soft)', flex: 1, minWidth: 120 }}>{course ? course.name : 'Unknown'}</div>
+                      {g.room && <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)' }}>{g.room}</div>}
                       {g.meetingLink && (
                         <a
                           href={g.meetingLink}
                           target="_blank"
                           rel="noreferrer"
                           className="gt-mono"
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#3B5BA9', textDecoration: 'none', fontWeight: 600 }}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--c-link)', textDecoration: 'none', fontWeight: 600 }}
                         >
                           <Video size={13} /> Join
                         </a>

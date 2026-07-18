@@ -74,8 +74,8 @@ export default function DataManager({ data, importData }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: '100%' }}>
       <div>
         <Eyebrow>Data Manager</Eyebrow>
-        <div className="gt-serif" style={{ fontSize: 22, color: '#2A2E28' }}>Import &amp; Export</div>
-        <div style={{ fontSize: 13, color: '#8A8A7E', marginTop: 4, maxWidth: 560 }}>
+        <div className="gt-serif" style={{ fontSize: 22, color: 'var(--c-ink-soft)' }}>Import &amp; Export</div>
+        <div style={{ fontSize: 13, color: 'var(--c-text-faint)', marginTop: 4, maxWidth: 560 }}>
           Your gradebook lives in a single JSON file. Export it to back it up or move it to another device, or import a file to restore it.
         </div>
       </div>
@@ -84,8 +84,8 @@ export default function DataManager({ data, importData }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
           {stats.map(s => (
             <div key={s.label} style={{ textAlign: 'center', padding: '18px 10px', borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
-              <div className="gt-mono" style={{ fontSize: 26, fontWeight: 700, color: '#2D5240' }}>{s.value}</div>
-              <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8A7E', marginTop: 4 }}>{s.label}</div>
+              <div className="gt-mono" style={{ fontSize: 26, fontWeight: 700, color: 'var(--c-forest)' }}>{s.value}</div>
+              <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--c-text-faint)', marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -95,11 +95,11 @@ export default function DataManager({ data, importData }) {
         <div className="gt-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <div style={{ width: 42, height: 42, borderRadius: 10, background: 'rgba(45,82,64,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <DownloadCloud size={19} color="#2D5240" />
+              <DownloadCloud size={19} color="var(--c-forest)" />
             </div>
             <div>
-              <div className="gt-serif" style={{ fontSize: 17, color: '#2A2E28' }}>Export All Data</div>
-              <div style={{ fontSize: 12.5, color: '#8A8A7E', marginTop: 3 }}>
+              <div className="gt-serif" style={{ fontSize: 17, color: 'var(--c-ink-soft)' }}>Export All Data</div>
+              <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)', marginTop: 3 }}>
                 Downloads a JSON file with your account, terms, courses, schedule, grades, and assessments.
               </div>
             </div>
@@ -113,11 +113,11 @@ export default function DataManager({ data, importData }) {
           <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <div style={{ width: 42, height: 42, borderRadius: 10, background: 'rgba(59,91,169,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <UploadCloud size={19} color="#3B5BA9" />
+                <UploadCloud size={19} color="var(--c-link)" />
               </div>
               <div>
-                <div className="gt-serif" style={{ fontSize: 17, color: '#2A2E28' }}>Import Data</div>
-                <div style={{ fontSize: 12.5, color: '#8A8A7E', marginTop: 3 }}>
+                <div className="gt-serif" style={{ fontSize: 17, color: 'var(--c-ink-soft)' }}>Import Data</div>
+                <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)', marginTop: 3 }}>
                   Restores from a previously exported JSON file. This replaces everything currently in your gradebook.
                 </div>
               </div>
@@ -131,7 +131,7 @@ export default function DataManager({ data, importData }) {
               className="gt-mono"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 16px',
-                borderRadius: 8, border: '1.5px solid #3B5BA9', background: 'transparent', color: '#3B5BA9',
+                borderRadius: 8, border: '1.5px solid var(--c-link)', background: 'transparent', color: 'var(--c-link)',
                 fontSize: 12.5, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
               }}
             >
@@ -140,23 +140,23 @@ export default function DataManager({ data, importData }) {
           </div>
 
           {importError && (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 12px', borderRadius: 8, background: 'rgba(178,58,46,0.08)', color: '#B23A2E', fontSize: 12.5 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 12px', borderRadius: 8, background: 'rgba(178,58,46,0.08)', color: 'var(--c-danger)', fontSize: 12.5 }}>
               <AlertTriangle size={15} /> {importError}
             </div>
           )}
 
           {importedOk && !pendingImport && (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 12px', borderRadius: 8, background: 'rgba(45,82,64,0.08)', color: '#2D5240', fontSize: 12.5 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 12px', borderRadius: 8, background: 'rgba(45,82,64,0.08)', color: 'var(--c-forest)', fontSize: 12.5 }}>
               <Check size={15} /> Import complete — your gradebook has been restored.
             </div>
           )}
 
           {pendingImport && (
-            <div style={{ padding: 14, borderRadius: 10, background: 'rgba(178,58,46,0.06)', border: '1.5px solid #E3B8B0' }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', color: '#B23A2E', fontWeight: 600, fontSize: 13 }}>
+            <div style={{ padding: 14, borderRadius: 10, background: 'rgba(178,58,46,0.06)', border: '1.5px solid var(--c-danger-tint)' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', color: 'var(--c-danger)', fontWeight: 600, fontSize: 13 }}>
                 <AlertTriangle size={15} /> Replace all current data?
               </div>
-              <div style={{ fontSize: 12.5, color: '#8A8A7E', marginTop: 4 }}>
+              <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)', marginTop: 4 }}>
                 This file has {(pendingImport.terms || []).length} term(s) and {(pendingImport.courses || []).length} course(s). Importing will overwrite everything you currently have — this cannot be undone.
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
@@ -165,7 +165,7 @@ export default function DataManager({ data, importData }) {
                   className="gt-mono"
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px',
-                    borderRadius: 8, border: 'none', background: '#B23A2E', color: '#FCFBF7',
+                    borderRadius: 8, border: 'none', background: 'var(--c-danger)', color: 'var(--c-surface)',
                     fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
                   }}
                 >

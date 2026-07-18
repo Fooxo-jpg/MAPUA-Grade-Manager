@@ -4,9 +4,9 @@ import { COURSE_COLORS, COURSE_TYPES, uid, getCourseStatus } from '../utils';
 import { Eyebrow, EmptyState, TextField, CoursePicker, ColorSwatchPicker, PrimaryButton, IconButton } from './SharedUI';
 
 const STATUS_META = {
-  taken: { label: 'Taken', color: '#2D5240', bg: 'rgba(45,82,64,0.1)' },
-  current: { label: 'In Current Load', color: '#3B5BA9', bg: 'rgba(59,91,169,0.1)' },
-  'not-yet': { label: 'Not Yet Taken', color: '#8A8A7E', bg: 'rgba(0,0,0,0.05)' },
+  taken: { label: 'Taken', color: 'var(--c-forest)', bg: 'rgba(45,82,64,0.1)' },
+  current: { label: 'In Current Load', color: 'var(--c-link)', bg: 'rgba(59,91,169,0.1)' },
+  'not-yet': { label: 'Not Yet Taken', color: 'var(--c-text-faint)', bg: 'rgba(0,0,0,0.05)' },
 };
 
 function CategoryEditor({ categories, onChange }) {
@@ -32,10 +32,10 @@ function CategoryEditor({ categories, onChange }) {
             <span
               key={cat.id}
               className="gt-mono"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: '#4A5048', background: 'rgba(0,0,0,0.04)', padding: '3px 6px 3px 10px', borderRadius: 20 }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: 'var(--c-text)', background: 'rgba(0,0,0,0.04)', padding: '3px 6px 3px 10px', borderRadius: 20 }}
             >
               {cat.name} · {cat.weight}%
-              <button onClick={() => remove(cat.id)} title="Remove category" style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#B23A2E', display: 'inline-flex', padding: 2 }}>
+              <button onClick={() => remove(cat.id)} title="Remove category" style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--c-danger)', display: 'inline-flex', padding: 2 }}>
                 <X size={11} />
               </button>
             </span>
@@ -45,11 +45,11 @@ function CategoryEditor({ categories, onChange }) {
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <input
           type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Category name (e.g. Quizzes)"
-          className="gt-mono" style={{ padding: '7px 9px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 12.5, background: '#FCFBF7', color: '#2A2E28', width: 180 }}
+          className="gt-mono" style={{ padding: '7px 9px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 12.5, background: 'var(--c-surface)', color: 'var(--c-ink-soft)', width: 180 }}
         />
         <input
           type="text" inputMode="decimal" value={weight} onChange={e => setWeight(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="Weight %"
-          className="gt-mono" style={{ padding: '7px 9px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 12.5, background: '#FCFBF7', color: '#2A2E28', width: 90, textAlign: 'center' }}
+          className="gt-mono" style={{ padding: '7px 9px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 12.5, background: 'var(--c-surface)', color: 'var(--c-ink-soft)', width: 90, textAlign: 'center' }}
         />
         <IconButton icon={Plus} onClick={add} title="Add category" />
       </div>
@@ -104,7 +104,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
         <Eyebrow>Manage Courses</Eyebrow>
-        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: '#22392D' }}>Course Catalog</h1>
+        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>Course Catalog</h1>
 
         {!showAddForm ? (
           <PrimaryButton onClick={() => setShowAddForm(true)} icon={Plus}>Add New Course</PrimaryButton>
@@ -120,11 +120,11 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
             <TextField label="Units" value={form.units} onChange={v => setForm({ ...form, units: v.replace(/[^0-9.]/g, '') })} placeholder="3" mono />
             <TextField label="Instructor" value={form.instructor} onChange={v => setForm({ ...form, instructor: v })} placeholder="Optional" />
             <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 160 }}>
-              <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Course Type</span>
+              <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Course Type</span>
               <select
                 value={form.courseType}
                 onChange={e => setForm({ ...form, courseType: e.target.value })}
-                style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 14, background: '#FCFBF7', color: '#2A2E28' }}
+                style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
               >
                 {COURSE_TYPES.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
               </select>
@@ -142,9 +142,9 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                 type="checkbox"
                 checked={form.unitsConsidered}
                 onChange={e => setForm({ ...form, unitsConsidered: e.target.checked })}
-                style={{ width: 16, height: 16, accentColor: '#2D5240', cursor: 'pointer' }}
+                style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
               />
-              <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: '#4A5048' }}>
+              <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)' }}>
                 Units Considered (counts toward GWA)
               </span>
             </label>
@@ -156,9 +156,9 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                 type="checkbox"
                 checked={form.useCategoryWeights}
                 onChange={e => setForm({ ...form, useCategoryWeights: e.target.checked })}
-                style={{ width: 16, height: 16, accentColor: '#2D5240', cursor: 'pointer' }}
+                style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
               />
-              <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: '#4A5048', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                 <Tag size={12} /> Use category weights
               </span>
             </label>
@@ -169,7 +169,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, flexWrap: 'wrap', gap: 12 }}>
             <div>
-              <div className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600, marginBottom: 6 }}>Color</div>
+              <div className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, marginBottom: 6 }}>Color</div>
               <ColorSwatchPicker value={form.color} onChange={v => setForm({ ...form, color: v })} />
             </div>
             <PrimaryButton onClick={submit} icon={Plus} style={{ opacity: canSubmit ? 1 : 0.5 }}>Add Course</PrimaryButton>
@@ -194,11 +194,11 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                       <TextField label="Units" value={editForm.units} onChange={v => setEditForm({ ...editForm, units: v.replace(/[^0-9.]/g, '') })} mono />
                       <TextField label="Instructor" value={editForm.instructor} onChange={v => setEditForm({ ...editForm, instructor: v })} />
                       <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 160 }}>
-                        <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Course Type</span>
+                        <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Course Type</span>
                         <select
                           value={editForm.courseType}
                           onChange={e => setEditForm({ ...editForm, courseType: e.target.value })}
-                          style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 14, background: '#FCFBF7', color: '#2A2E28' }}
+                          style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                         >
                           {COURSE_TYPES.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
                         </select>
@@ -214,9 +214,9 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={editForm.unitsConsidered}
                           onChange={e => setEditForm({ ...editForm, unitsConsidered: e.target.checked })}
-                          style={{ width: 16, height: 16, accentColor: '#2D5240', cursor: 'pointer' }}
+                          style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
                         />
-                        <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: '#4A5048' }}>
+                        <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)' }}>
                           Units Considered (counts toward GWA)
                         </span>
                       </label>
@@ -227,9 +227,9 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={editForm.useCategoryWeights}
                           onChange={e => setEditForm({ ...editForm, useCategoryWeights: e.target.checked })}
-                          style={{ width: 16, height: 16, accentColor: '#2D5240', cursor: 'pointer' }}
+                          style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
                         />
-                        <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: '#4A5048', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                        <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                           <Tag size={12} /> Use category weights
                         </span>
                       </label>
@@ -252,7 +252,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                         <span style={{ fontSize: 12.5, fontWeight: 700, color: c.color }}>{c.code}</span>
                       </div>
                       <div style={{ flex: 1, minWidth: 160 }}>
-                        <div className="gt-serif" style={{ fontSize: 15.5, color: '#2A2E28', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <div className="gt-serif" style={{ fontSize: 15.5, color: 'var(--c-ink-soft)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                           {c.name}
                           {c.courseType && (
                             <span className="gt-mono" style={{
@@ -273,14 +273,14 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                             ) : null;
                           })()}
                         </div>
-                        <div style={{ fontSize: 12.5, color: '#8A8A7E' }}>{c.units || 0} unit{c.units == 1 ? '' : 's'}{c.instructor ? ` · ${c.instructor}` : ''}</div>
+                        <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)' }}>{c.units || 0} unit{c.units == 1 ? '' : 's'}{c.instructor ? ` · ${c.instructor}` : ''}</div>
                         {(c.prerequisites || []).length > 0 && (
-                          <div style={{ fontSize: 12, color: '#8A8A7E', marginTop: 3 }}>
+                          <div style={{ fontSize: 12, color: 'var(--c-text-faint)', marginTop: 3 }}>
                             Prerequisites: {c.prerequisites.map(id => (data.courses.find(x => x.id === id) || {}).code || '?').join(', ')}
                           </div>
                         )}
                         {(c.corequisites || []).length > 0 && (
-                          <div style={{ fontSize: 12, color: '#8A8A7E', marginTop: 2 }}>
+                          <div style={{ fontSize: 12, color: 'var(--c-text-faint)', marginTop: 2 }}>
                             Co-requisites: {c.corequisites.map(id => (data.courses.find(x => x.id === id) || {}).code || '?').join(', ')}
                           </div>
                         )}
@@ -290,9 +290,9 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={c.unitsConsidered !== false}
                           onChange={e => updateCourse(c.id, { unitsConsidered: e.target.checked })}
-                          style={{ width: 15, height: 15, accentColor: '#2D5240', cursor: 'pointer' }}
+                          style={{ width: 15, height: 15, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
                         />
-                        <span className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: '#7C8A80' }}>
+                        <span className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text-muted)' }}>
                           Units Considered
                         </span>
                       </label>
@@ -301,15 +301,15 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={!!c.useCategoryWeights}
                           onChange={e => updateCourse(c.id, { useCategoryWeights: e.target.checked })}
-                          style={{ width: 15, height: 15, accentColor: '#2D5240', cursor: 'pointer' }}
+                          style={{ width: 15, height: 15, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
                         />
-                        <span className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: '#7C8A80', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <span className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text-muted)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                           <Tag size={11} /> Categories
                         </span>
                       </label>
                       {confirmDeleteId === c.id ? (
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                          <span style={{ fontSize: 12.5, color: '#B23A2E' }}>Delete?</span>
+                          <span style={{ fontSize: 12.5, color: 'var(--c-danger)' }}>Delete?</span>
                           <IconButton icon={Check} onClick={() => { deleteCourse(c.id); setConfirmDeleteId(null); }} title="Confirm" danger />
                           <IconButton icon={X} onClick={() => setConfirmDeleteId(null)} title="Cancel" />
                         </div>
@@ -325,13 +325,13 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                         {(c.categories || []).length > 0 ? (
                           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                             {c.categories.map(cat => (
-                              <span key={cat.id} className="gt-mono" style={{ fontSize: 11, fontWeight: 600, color: '#4A5048', background: 'rgba(0,0,0,0.04)', padding: '3px 9px', borderRadius: 20 }}>
+                              <span key={cat.id} className="gt-mono" style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text)', background: 'rgba(0,0,0,0.04)', padding: '3px 9px', borderRadius: 20 }}>
                                 {cat.name} · {cat.weight}%
                               </span>
                             ))}
                           </div>
                         ) : (
-                          <div style={{ fontSize: 11.5, color: '#B0AA98', fontStyle: 'italic' }}>
+                          <div style={{ fontSize: 11.5, color: 'var(--c-text-placeholder)', fontStyle: 'italic' }}>
                             No categories yet — add one while logging an assessment in Manage Grades, or edit this course.
                           </div>
                         )}

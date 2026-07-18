@@ -13,26 +13,26 @@ function FinalGradeField({ termId, course, percent, account, grades, updateGrade
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-        <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>
+        <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>
           Possible Grade
         </span>
         {percent === null ? (
-          <span style={{ fontSize: 13, color: '#B0AA98' }}>No scored assessments yet</span>
+          <span style={{ fontSize: 13, color: 'var(--c-text-placeholder)' }}>No scored assessments yet</span>
         ) : (
           <>
-            <span className="gt-mono" style={{ fontSize: 20, fontWeight: 700, color: '#2D5240' }}>{percent.toFixed(2)}%</span>
+            <span className="gt-mono" style={{ fontSize: 20, fontWeight: 700, color: 'var(--c-forest)' }}>{percent.toFixed(2)}%</span>
             {gradePoint !== null ? (
-              <span className="gt-mono" style={{ fontSize: 13, fontWeight: 700, color: '#B8860B', background: '#F5E7BE', padding: '2px 10px', borderRadius: 20 }}>
+              <span className="gt-mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-gold)', background: 'var(--c-gold-tint)', padding: '2px 10px', borderRadius: 20 }}>
                 {gradePoint.toFixed(2)}
               </span>
             ) : (
-              <span style={{ fontSize: 12, color: '#B0AA98' }}>Add a grade conversion table in Account Settings to see the grade point</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-placeholder)' }}>Add a grade conversion table in Account Settings to see the grade point</span>
             )}
           </>
         )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>
+        <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>
           Final Grade
         </span>
         <GradeSelect
@@ -42,7 +42,7 @@ function FinalGradeField({ termId, course, percent, account, grades, updateGrade
           title={isAuto ? 'Computed from the assessment log above — choose to override' : ''}
         />
         {isAuto && (
-          <span className="gt-mono" title="Computed from the assessment log" style={{ fontSize: 9.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700, color: '#7C8A80', background: 'rgba(0,0,0,0.04)', padding: '2px 6px', borderRadius: 20 }}>
+          <span className="gt-mono" title="Computed from the assessment log" style={{ fontSize: 9.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--c-text-muted)', background: 'rgba(0,0,0,0.04)', padding: '2px 6px', borderRadius: 20 }}>
             Auto from log
           </span>
         )}
@@ -51,7 +51,7 @@ function FinalGradeField({ termId, course, percent, account, grades, updateGrade
             onClick={() => updateGrade(termId, course.id, '')}
             className="gt-mono"
             title="Clear override and go back to the computed possible grade"
-            style={{ fontSize: 10.5, color: '#3B5BA9', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+            style={{ fontSize: 10.5, color: 'var(--c-link)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
           >
             Reset to computed
           </button>
@@ -98,9 +98,9 @@ function AssessmentPanel({ termId, course, list, account, grades, updateGrade, a
   const cols = locked ? '1fr 90px 90px 90px' : '1fr 90px 90px 90px 36px';
 
   return (
-    <div style={{ padding: '16px 18px', background: '#F5F3EA', borderTop: '1.5px solid #E3DCC9' }}>
+    <div style={{ padding: '16px 18px', background: 'var(--c-bg)', borderTop: '1.5px solid var(--c-border)' }}>
       {locked && (
-        <div className="gt-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: '#8A6A0D', background: '#F5E7BE', padding: '4px 10px', borderRadius: 20, fontWeight: 700, marginBottom: 14 }}>
+        <div className="gt-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: 'var(--c-gold-dark)', background: 'var(--c-gold-tint)', padding: '4px 10px', borderRadius: 20, fontWeight: 700, marginBottom: 14 }}>
           <Lock size={12} /> Term ended — read only
         </div>
       )}
@@ -110,7 +110,7 @@ function AssessmentPanel({ termId, course, list, account, grades, updateGrade, a
 
       {list.length > 0 && (
         <div className="gt-card" style={{ marginBottom: 14, overflowX: 'auto', overflowY: 'hidden', opacity: locked ? 0.75 : 1 }}>
-          <div className="gt-mono" style={{ display: 'grid', gridTemplateColumns: cols, gap: 8, padding: '8px 12px', fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600, background: 'rgba(0,0,0,0.02)', minWidth: 420 }}>
+          <div className="gt-mono" style={{ display: 'grid', gridTemplateColumns: cols, gap: 8, padding: '8px 12px', fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, background: 'rgba(0,0,0,0.02)', minWidth: 420 }}>
             <span>Assessment</span>
             <span>Score</span>
             <span>Total</span>
@@ -124,27 +124,27 @@ function AssessmentPanel({ termId, course, list, account, grades, updateGrade, a
                 key={a.id}
                 style={{
                   display: 'grid', gridTemplateColumns: cols, gap: 8, alignItems: 'center', minWidth: 420,
-                  padding: '9px 12px', borderTop: i > 0 ? '1px solid #EEE9DB' : 'none',
+                  padding: '9px 12px', borderTop: i > 0 ? '1px solid var(--c-divider)' : 'none',
                 }}
               >
-                <span style={{ fontSize: 13.5, color: '#2A2E28' }}>
+                <span style={{ fontSize: 13.5, color: 'var(--c-ink-soft)' }}>
                   {a.name}
-                  {!isNaN(pct) && <span className="gt-mono" style={{ fontSize: 11, color: '#B0AA98', marginLeft: 8 }}>{pct.toFixed(1)}%</span>}
+                  {!isNaN(pct) && <span className="gt-mono" style={{ fontSize: 11, color: 'var(--c-text-placeholder)', marginLeft: 8 }}>{pct.toFixed(1)}%</span>}
                 </span>
                 <input
                   type="text" inputMode="decimal" value={a.raw} disabled={locked}
                   onChange={e => !locked && updateAssessment(termId, course.id, a.id, { raw: e.target.value.replace(/[^0-9.]/g, '') })}
-                  className="gt-mono" style={{ width: '100%', padding: '6px 8px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 13, textAlign: 'center', background: locked ? '#EFECDF' : '#FCFBF7', color: '#2A2E28', cursor: locked ? 'not-allowed' : 'text' }}
+                  className="gt-mono" style={{ width: '100%', padding: '6px 8px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 13, textAlign: 'center', background: locked ? 'var(--c-surface-disabled)' : 'var(--c-surface)', color: 'var(--c-ink-soft)', cursor: locked ? 'not-allowed' : 'text' }}
                 />
                 <input
                   type="text" inputMode="decimal" value={a.total} disabled={locked}
                   onChange={e => !locked && updateAssessment(termId, course.id, a.id, { total: e.target.value.replace(/[^0-9.]/g, '') })}
-                  className="gt-mono" style={{ width: '100%', padding: '6px 8px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 13, textAlign: 'center', background: locked ? '#EFECDF' : '#FCFBF7', color: '#2A2E28', cursor: locked ? 'not-allowed' : 'text' }}
+                  className="gt-mono" style={{ width: '100%', padding: '6px 8px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 13, textAlign: 'center', background: locked ? 'var(--c-surface-disabled)' : 'var(--c-surface)', color: 'var(--c-ink-soft)', cursor: locked ? 'not-allowed' : 'text' }}
                 />
                 {useCat ? (() => {
                   const liveCat = categories.find(cat => cat.id === a.categoryId);
                   return (
-                    <span className="gt-mono" title="Weight follows the category — edit categories in Manage Courses" style={{ fontSize: 11.5, color: '#4A5048', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className="gt-mono" title="Weight follows the category — edit categories in Manage Courses" style={{ fontSize: 11.5, color: 'var(--c-text)', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {liveCat ? liveCat.name : (a.category || '—')} · {liveCat ? liveCat.weight : a.weight}%
                     </span>
                   );
@@ -152,7 +152,7 @@ function AssessmentPanel({ termId, course, list, account, grades, updateGrade, a
                   <input
                     type="text" inputMode="decimal" value={a.weight} disabled={locked}
                     onChange={e => !locked && updateAssessment(termId, course.id, a.id, { weight: e.target.value.replace(/[^0-9.]/g, '') })}
-                    className="gt-mono" style={{ width: '100%', padding: '6px 8px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 13, textAlign: 'center', background: locked ? '#EFECDF' : '#FCFBF7', color: '#2A2E28', cursor: locked ? 'not-allowed' : 'text' }}
+                    className="gt-mono" style={{ width: '100%', padding: '6px 8px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 13, textAlign: 'center', background: locked ? 'var(--c-surface-disabled)' : 'var(--c-surface)', color: 'var(--c-ink-soft)', cursor: locked ? 'not-allowed' : 'text' }}
                   />
                 )}
                 {!locked && (
@@ -188,8 +188,8 @@ function AssessmentPanel({ termId, course, list, account, grades, updateGrade, a
               </datalist>
               {matchedCategory ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 90 }}>
-                  <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Weight</span>
-                  <span className="gt-mono" style={{ fontSize: 13, padding: '9px 0', textAlign: 'center', color: '#8A8A7E' }}>{matchedCategory.weight}%</span>
+                  <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Weight</span>
+                  <span className="gt-mono" style={{ fontSize: 13, padding: '9px 0', textAlign: 'center', color: 'var(--c-text-faint)' }}>{matchedCategory.weight}%</span>
                 </div>
               ) : (
                 catTrim !== '' && (
@@ -232,7 +232,7 @@ export default function ManageGrades({ data, addAssessment, updateAssessment, de
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
         <Eyebrow>Manage Grades</Eyebrow>
-        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: '#22392D' }}>Log Assessment Scores</h1>
+        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>Log Assessment Scores</h1>
       </div>
 
       {data.terms.length === 0 ? (
@@ -252,20 +252,20 @@ export default function ManageGrades({ data, addAssessment, updateAssessment, de
                   className="gt-card"
                   style={{
                     textAlign: 'left', padding: 12, cursor: 'pointer',
-                    border: isSelected ? '2px solid #2D5240' : '1.5px solid #E3DCC9',
-                    background: isSelected ? '#EFF3EC' : '#FCFBF7',
+                    border: isSelected ? '2px solid var(--c-forest)' : '1.5px solid var(--c-border)',
+                    background: isSelected ? 'var(--c-surface-selected)' : 'var(--c-surface)',
                     opacity: ended ? 0.75 : 1,
                   }}
                 >
-                  <div className="gt-serif" style={{ fontSize: 15, color: '#2A2E28', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div className="gt-serif" style={{ fontSize: 15, color: 'var(--c-ink-soft)', display: 'flex', alignItems: 'center', gap: 6 }}>
                     {t.name}
-                    {isCurrent && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#B8860B', display: 'inline-block' }} />}
-                    {ended && <Lock size={11} style={{ color: '#B0AA98' }} />}
+                    {isCurrent && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--c-gold)', display: 'inline-block' }} />}
+                    {ended && <Lock size={11} style={{ color: 'var(--c-text-placeholder)' }} />}
                   </div>
-                  <div className="gt-mono" style={{ fontSize: 11, color: '#8A8A7E', marginTop: 2 }}>{formatDate(t.startDate)} – {formatDate(t.endDate)}</div>
+                  <div className="gt-mono" style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>{formatDate(t.startDate)} – {formatDate(t.endDate)}</div>
                   {stats.gwa !== null && (
-                    <div className="gt-mono" style={{ fontSize: 10.5, color: '#8A8A7E', marginTop: 4 }}>
-                      {stats.unitsConsidered} unit{stats.unitsConsidered == 1 ? '' : 's'} considered · <strong style={{ color: '#B8860B' }}>{stats.gwa.toFixed(2)}</strong> avg
+                    <div className="gt-mono" style={{ fontSize: 10.5, color: 'var(--c-text-faint)', marginTop: 4 }}>
+                      {stats.unitsConsidered} unit{stats.unitsConsidered == 1 ? '' : 's'} considered · <strong style={{ color: 'var(--c-gold)' }}>{stats.gwa.toFixed(2)}</strong> avg
                     </div>
                   )}
                 </button>
@@ -281,7 +281,7 @@ export default function ManageGrades({ data, addAssessment, updateAssessment, de
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {notStarted && (
-                  <div className="gt-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: '#4A5048', background: '#EFECDF', padding: '7px 12px', borderRadius: 8, fontWeight: 600, alignSelf: 'flex-start' }}>
+                  <div className="gt-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: 'var(--c-text)', background: 'var(--c-surface-disabled)', padding: '7px 12px', borderRadius: 8, fontWeight: 600, alignSelf: 'flex-start' }}>
                     <Clock3 size={13} /> This term starts {formatDate(selectedTerm.startDate)} — grades can't be logged until then.
                   </div>
                 )}
@@ -294,8 +294,8 @@ export default function ManageGrades({ data, addAssessment, updateAssessment, de
                       <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 14, flexWrap: 'wrap' }}>
                         <div className="gt-mono" style={{ fontSize: 12, fontWeight: 700, color: c.color, minWidth: 60 }}>{c.code}</div>
                         <div style={{ flex: 1 }}>
-                          <div className="gt-serif" style={{ fontSize: 15.5, color: '#2A2E28' }}>{c.name}</div>
-                          <div className="gt-mono" style={{ fontSize: 11.5, color: '#8A8A7E' }}>{list.length} assessment{list.length === 1 ? '' : 's'} logged</div>
+                          <div className="gt-serif" style={{ fontSize: 15.5, color: 'var(--c-ink-soft)' }}>{c.name}</div>
+                          <div className="gt-mono" style={{ fontSize: 11.5, color: 'var(--c-text-faint)' }}>{list.length} assessment{list.length === 1 ? '' : 's'} logged</div>
                         </div>
                         {effective.value !== undefined && effective.value !== '' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -304,8 +304,8 @@ export default function ManageGrades({ data, addAssessment, updateAssessment, de
                               title={effective.isComputed ? 'Computed from assessment log' : (effective.isOverride ? 'Manually set' : '')}
                               style={{
                                 fontSize: 13, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-                                color: effective.isComputed ? '#8A8A7E' : '#B8860B',
-                                background: effective.isComputed ? 'rgba(0,0,0,0.04)' : '#F5E7BE',
+                                color: effective.isComputed ? 'var(--c-text-faint)' : 'var(--c-gold)',
+                                background: effective.isComputed ? 'rgba(0,0,0,0.04)' : 'var(--c-gold-tint)',
                                 fontStyle: effective.isComputed ? 'italic' : 'normal',
                               }}
                             >

@@ -6,13 +6,11 @@ import { Eyebrow, EmptyState } from './SharedUI';
 
 function Stamp({ currentTerm }) {
   const isBreak = !currentTerm;
-  const color = isBreak ? '#B23A2E' : '#2D5240';
+  const color = isBreak ? 'var(--c-danger)' : 'var(--c-forest)';
   return (
     <div
       className="gt-stamp"
-      style={{
-        color, display: 'inline-block', padding: '18px 30px', background: 'rgba(255,255,255,0.5)',
-      }}
+      style={{ color, display: 'inline-block', padding: '18px 30px', background: 'rgba(255,255,255,0.5)' }}
     >
       <div className="gt-serif" style={{ fontSize: isBreak ? 30 : 22, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', textAlign: 'center' }}>
         {isBreak ? 'Break Mode' : currentTerm.name}
@@ -20,6 +18,18 @@ function Stamp({ currentTerm }) {
       <div className="gt-mono" style={{ fontSize: 11.5, textAlign: 'center', marginTop: 6, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
         {isBreak ? 'No active term for today' : `${formatDate(currentTerm.startDate)} — ${formatDate(currentTerm.endDate)}`}
       </div>
+    </div>
+  );
+}
+
+function StatCard({ label, labelIcon: LabelIcon, sub, children }) {
+  return (
+    <div className="gt-card gt-card--hover gt-stat-card">
+      <div className="gt-stat-label">
+        {LabelIcon && <LabelIcon size={13} />} {label}
+        {sub && <span className="gt-stat-label-sub"> · {sub}</span>}
+      </div>
+      {children}
     </div>
   );
 }
@@ -61,6 +71,7 @@ export default function Dashboard({ data }) {
     }, 0);
   }, 0);
   const leftUnits = Math.max(requiredUnits - passedUnits, 0);
+  const progressPct = requiredUnits > 0 ? Math.min(100, Math.round((passedUnits / requiredUnits) * 100)) : 0;
 
   const goalGWA = parseFloat(data.account.goalGWA);
   const hasGoal = !isNaN(goalGWA);
@@ -86,10 +97,10 @@ export default function Dashboard({ data }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+    <div className="gt-section">
       <div>
         <Eyebrow>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</Eyebrow>
-        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: '#22392D' }}>Dashboard</h1>
+        <h1 className="gt-serif gt-page-title">Dashboard</h1>
         <Stamp currentTerm={currentTerm} />
       </div>
 
@@ -104,10 +115,10 @@ export default function Dashboard({ data }) {
         {currentTerm && termCourses.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12, marginTop: 10 }}>
             {termCourses.map(c => (
-              <div key={c.id} className="gt-card" style={{ padding: 14, borderLeft: `5px solid ${c.color}` }}>
+              <div key={c.id} className="gt-card gt-card--hover" style={{ padding: 14, borderLeft: `5px solid ${c.color}` }}>
                 <div className="gt-mono" style={{ fontSize: 12, fontWeight: 700, color: c.color }}>{c.code}</div>
-                <div className="gt-serif" style={{ fontSize: 16, color: '#2A2E28', margin: '2px 0' }}>{c.name}</div>
-                <div style={{ fontSize: 12.5, color: '#8A8A7E' }}>{c.units} unit{c.units == 1 ? '' : 's'}{c.instructor ? ` · ${c.instructor}` : ''}</div>
+                <div className="gt-serif" style={{ fontSize: 16, color: 'var(--c-ink-soft)', margin: '2px 0' }}>{c.name}</div>
+                <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)' }}>{c.units} unit{c.units == 1 ? '' : 's'}{c.instructor ? ` · ${c.instructor}` : ''}</div>
               </div>
             ))}
           </div>
@@ -124,24 +135,24 @@ export default function Dashboard({ data }) {
               {todaysSchedule.map(s => {
                 const course = data.courses.find(c => c.id === s.courseId);
                 return (
-                  <div key={s.id} className="gt-card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-                    <div className="gt-mono" style={{ fontSize: 12.5, color: '#4A5048' }}>
+                  <div key={s.id} className="gt-card gt-card--hover" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                    <div className="gt-mono" style={{ fontSize: 12.5, color: 'var(--c-text)', minWidth: 108 }}>
                       {formatTime(s.startTime)} – {formatTime(s.endTime)}
                     </div>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: course ? course.color : '#999' }} />
-                    <div style={{ fontSize: 14, color: '#2A2E28', fontWeight: 500 }}>{course ? course.name : 'Unknown course'}</div>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: course ? course.color : 'var(--c-text-placeholder)', flexShrink: 0 }} />
+                    <div style={{ fontSize: 14, color: 'var(--c-ink-soft)', fontWeight: 500 }}>{course ? course.name : 'Unknown course'}</div>
                     {s.meetingLink && (
                       <a
                         href={s.meetingLink}
                         target="_blank"
                         rel="noreferrer"
                         className="gt-mono"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#3B5BA9', textDecoration: 'none', fontWeight: 600, marginLeft: s.room ? 0 : 'auto' }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--c-link)', textDecoration: 'none', fontWeight: 600, marginLeft: s.room ? 0 : 'auto' }}
                       >
                         <Video size={13} /> Join
                       </a>
                     )}
-                    {s.room && <div style={{ fontSize: 12.5, color: '#8A8A7E', marginLeft: 'auto' }}>{s.room}</div>}
+                    {s.room && <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)', marginLeft: 'auto' }}>{s.room}</div>}
                   </div>
                 );
               })}
@@ -153,20 +164,32 @@ export default function Dashboard({ data }) {
       {requiredUnits > 0 && (
         <div>
           <Eyebrow>Progress to Graduation</Eyebrow>
-          <div className="gt-card" style={{ padding: 18, marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
-            <div>
-              <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8A7E', display: 'flex', alignItems: 'center', gap: 5 }}>
-                <GraduationCap size={13} /> Total Units Required
+          <div className="gt-card" style={{ padding: 18, marginTop: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
+              <div>
+                <div className="gt-stat-label"><GraduationCap size={13} /> Total Units Required</div>
+                <div className="gt-stat-value">{requiredUnits}</div>
               </div>
-              <div className="gt-serif" style={{ fontSize: 26, color: '#2A2E28', marginTop: 4 }}>{requiredUnits}</div>
+              <div>
+                <div className="gt-stat-label">Passed</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-forest)' }}>{passedUnits}</div>
+              </div>
+              <div>
+                <div className="gt-stat-label">Left</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-gold)' }}>{leftUnits}</div>
+              </div>
             </div>
-            <div>
-              <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8A7E' }}>Passed</div>
-              <div className="gt-serif" style={{ fontSize: 26, color: '#2D5240', marginTop: 4 }}>{passedUnits}</div>
-            </div>
-            <div>
-              <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8A7E' }}>Left</div>
-              <div className="gt-serif" style={{ fontSize: 26, color: '#B8860B', marginTop: 4 }}>{leftUnits}</div>
+            <div style={{ marginTop: 16 }}>
+              <div style={{ height: 8, borderRadius: 999, background: 'var(--c-divider)', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    height: '100%', width: `${progressPct}%`, borderRadius: 999,
+                    background: 'linear-gradient(90deg, var(--c-forest), var(--c-gold))',
+                    transition: 'width 400ms var(--ease)',
+                  }}
+                />
+              </div>
+              <div className="gt-mono" style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 6 }}>{progressPct}% complete</div>
             </div>
           </div>
         </div>
@@ -175,61 +198,52 @@ export default function Dashboard({ data }) {
       <div>
         <Eyebrow>This Term at a Glance</Eyebrow>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginTop: 10 }}>
-          <div className="gt-card" style={{ padding: 18 }}>
-            <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8A7E' }}>
-              Units Considered <span style={{ textTransform: 'none', fontWeight: 400 }}>· this term</span>
-            </div>
+          <StatCard label="Units Considered" sub="this term">
             {!currentTerm ? (
-              <div style={{ fontSize: 13, color: '#8A8A7E', marginTop: 8 }}>No active term right now.</div>
+              <div className="gt-stat-empty">No active term right now.</div>
             ) : (
               <>
-                <div className="gt-serif" style={{ fontSize: 30, color: '#2A2E28', marginTop: 4 }}>{termStats.unitsConsidered}</div>
-                <div style={{ fontSize: 11.5, color: '#8A8A7E', marginTop: 2 }}>out of {termStats.totalUnits} unit{termStats.totalUnits == 1 ? '' : 's'} in {currentTerm.name}</div>
+                <div className="gt-stat-value">{termStats.unitsConsidered}</div>
+                <div className="gt-stat-caption">out of {termStats.totalUnits} unit{termStats.totalUnits == 1 ? '' : 's'} in {currentTerm.name}</div>
               </>
             )}
-          </div>
+          </StatCard>
 
-          <div className="gt-card" style={{ padding: 18 }}>
-            <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8A7E', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Target size={13} /> Grade Needed <span style={{ textTransform: 'none', fontWeight: 400 }}>· this term</span>
-            </div>
+          <StatCard label="Grade Needed" labelIcon={Target} sub="this term">
             {!currentTerm ? (
-              <div style={{ fontSize: 13, color: '#8A8A7E', marginTop: 8 }}>No active term right now.</div>
+              <div className="gt-stat-empty">No active term right now.</div>
             ) : !hasGoal ? (
-              <div style={{ fontSize: 13, color: '#8A8A7E', marginTop: 8 }}>Set a goal GWA in Account Settings.</div>
+              <div className="gt-stat-empty">Set a goal GWA in Account Settings.</div>
             ) : currentTermUnits === 0 ? (
-              <div style={{ fontSize: 13, color: '#8A8A7E', marginTop: 8 }}>No courses assigned yet.</div>
+              <div className="gt-stat-empty">No courses assigned yet.</div>
             ) : neededStatus === 'secured' ? (
               <>
-                <div className="gt-serif" style={{ fontSize: 22, color: '#2D5240', marginTop: 4 }}>Secured</div>
-                <div style={{ fontSize: 11.5, color: '#8A8A7E', marginTop: 2 }}>Already on pace for {goalGWA.toFixed(2)}</div>
+                <div className="gt-serif" style={{ fontSize: 22, color: 'var(--c-forest)', marginTop: 4 }}>Secured</div>
+                <div className="gt-stat-caption">Already on pace for {goalGWA.toFixed(2)}</div>
               </>
             ) : neededStatus === 'unreachable' ? (
               <>
-                <div className="gt-serif" style={{ fontSize: 22, color: '#B23A2E', marginTop: 4 }}>Out of reach</div>
-                <div style={{ fontSize: 11.5, color: '#8A8A7E', marginTop: 2 }}>{goalGWA.toFixed(2)} isn't reachable this term</div>
+                <div className="gt-serif" style={{ fontSize: 22, color: 'var(--c-danger)', marginTop: 4 }}>Out of reach</div>
+                <div className="gt-stat-caption">{goalGWA.toFixed(2)} isn't reachable this term</div>
               </>
             ) : (
               <>
-                <div className="gt-serif" style={{ fontSize: 30, color: '#B8860B', marginTop: 4 }}>{neededGrade.toFixed(2)}</div>
-                <div style={{ fontSize: 11.5, color: '#8A8A7E', marginTop: 2 }}>average across {currentTermUnits} unit{currentTermUnits == 1 ? '' : 's'} to stay at {goalGWA.toFixed(2)}</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-gold)' }}>{neededGrade.toFixed(2)}</div>
+                <div className="gt-stat-caption">average across {currentTermUnits} unit{currentTermUnits == 1 ? '' : 's'} to stay at {goalGWA.toFixed(2)}</div>
               </>
             )}
-          </div>
+          </StatCard>
 
-          <div className="gt-card" style={{ padding: 18 }}>
-            <div className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8A7E' }}>
-              Average GWA <span style={{ textTransform: 'none', fontWeight: 400 }}>· overall</span>
-            </div>
+          <StatCard label="Average GWA" sub="overall">
             {cumulative.gwa === null ? (
-              <div style={{ fontSize: 13, color: '#8A8A7E', marginTop: 8 }}>No finished terms yet.</div>
+              <div className="gt-stat-empty">No finished terms yet.</div>
             ) : (
               <>
-                <div className="gt-serif" style={{ fontSize: 30, color: '#B8860B', marginTop: 4 }}>{cumulative.gwa.toFixed(2)}</div>
-                <div style={{ fontSize: 11.5, color: '#8A8A7E', marginTop: 2 }}>across {cumulative.unitsConsidered} unit{cumulative.unitsConsidered == 1 ? '' : 's'} considered</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-gold)' }}>{cumulative.gwa.toFixed(2)}</div>
+                <div className="gt-stat-caption">across {cumulative.unitsConsidered} unit{cumulative.unitsConsidered == 1 ? '' : 's'} considered</div>
               </>
             )}
-          </div>
+          </StatCard>
         </div>
       </div>
 
@@ -242,22 +256,28 @@ export default function Dashboard({ data }) {
             <div style={{ width: '100%', height: 220 }}>
               <ResponsiveContainer>
                 <LineChart data={chartData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gwaLine" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#2D5240" />
+                      <stop offset="100%" stopColor="#B8860B" />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid stroke="#EEE9DB" vertical={false} />
                   <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#8A8A7E' }} axisLine={{ stroke: '#DDD6C4' }} tickLine={false} />
                   <YAxis reversed={lowerIsBetter} tick={{ fontSize: 11, fill: '#8A8A7E' }} axisLine={false} tickLine={false} width={36} domain={['auto', 'auto']} />
                   <Tooltip
-                    contentStyle={{ background: '#FCFBF7', border: '1.5px solid #E3DCC9', borderRadius: 8, fontSize: 12.5 }}
+                    contentStyle={{ background: '#FCFBF7', border: '1.5px solid #E3DCC9', borderRadius: 8, fontSize: 12.5, boxShadow: '0 6px 18px rgba(34,57,45,0.12)' }}
                     labelFormatter={(_, payload) => (payload && payload[0] ? payload[0].payload.fullName : '')}
                   />
-                  <Line type="monotone" dataKey="gwa" stroke="#B8860B" strokeWidth={2.5} dot={{ r: 4, fill: '#B8860B' }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="gwa" stroke="url(#gwaLine)" strokeWidth={2.75} dot={{ r: 4, fill: '#B8860B', strokeWidth: 0 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 14 }}>
               {gwaHistory.map(row => (
-                <div key={row.term.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px', borderTop: '1px solid #EEE9DB' }}>
-                  <span style={{ fontSize: 13.5, color: '#2A2E28' }}>{row.term.name}</span>
-                  <span className="gt-mono" style={{ fontSize: 13, fontWeight: 700, color: '#B8860B' }}>{row.gwa.toFixed(2)}</span>
+                <div key={row.term.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px', borderTop: '1px solid var(--c-divider)' }}>
+                  <span style={{ fontSize: 13.5, color: 'var(--c-ink-soft)' }}>{row.term.name}</span>
+                  <span className="gt-mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-gold)' }}>{row.gwa.toFixed(2)}</span>
                 </div>
               ))}
             </div>

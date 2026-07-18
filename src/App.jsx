@@ -44,13 +44,13 @@ export default function App() {
     }, 350);
   }, []);
 
-  function update(fn) {
+  const update = useCallback((fn) => {
     setData(prev => {
       const next = fn(prev);
       persist(next);
       return next;
     });
-  }
+  }, [persist]);
 
   const addCourse = (course) => update(d => ({ ...d, courses: [...d.courses, course] }));
   const updateCourse = (id, patch) => update(d => ({ ...d, courses: d.courses.map(c => c.id === id ? { ...c, ...patch } : c) }));
@@ -163,21 +163,24 @@ export default function App() {
 
   if (!loaded) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, fontFamily: 'Inter, sans-serif', color: '#7C8A80' }}>
-        Loading your gradebook…
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
+        height: '100vh', fontFamily: 'Inter, sans-serif', color: 'var(--c-text-muted)', background: 'var(--c-bg)',
+      }}>
+        <div style={{
+          width: 22, height: 22, borderRadius: '50%', border: '2.5px solid var(--c-border-strong)',
+          borderTopColor: 'var(--c-forest)', animation: 'gt-spin 0.7s linear infinite',
+        }} />
+        <span className="gt-mono" style={{ fontSize: 12.5, letterSpacing: '0.04em' }}>Loading your gradebook…</span>
+        <style>{'@keyframes gt-spin { to { transform: rotate(360deg); } }'}</style>
       </div>
     );
   }
 
   return (
-    <div
-      className="gt-root"
-      style={{
-        height: '100vh', background: '#F5F3EA', overflow: 'hidden', border: '1px solid #E3DCC9',
-      }}
-    >
+    <div className="gt-root" style={{ height: '100vh' }}>
       <Sidebar active={active} setActive={setActive} studentName={studentName} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
-      <div className="gt-main" style={{ overflowY: 'auto' }}>
+      <div className="gt-main">
         {active === 'dashboard' && <Dashboard data={data} />}
         {active === 'grades' && <ManageGrades data={data} addAssessment={addAssessment} updateAssessment={updateAssessment} deleteAssessment={deleteAssessment} updateGrade={updateGrade} updateCourse={updateCourse} />}
         {active === 'courses' && <ManageCourses data={data} addCourse={addCourse} updateCourse={updateCourse} deleteCourse={deleteCourse} />}

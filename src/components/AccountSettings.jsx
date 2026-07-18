@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trash2, Plus, Check, X, ChevronUp, ChevronDown, Sparkles, CalendarRange, Pencil } from 'lucide-react';
-import { getCurrentTerm, uid, generateTerms, formatDate, termDurationDays } from '../utils';
+import { getCurrentTerm, uid, generateTerms, formatDate, termDurationDays, MAPUA_PROGRAMS } from '../utils';
 import { Eyebrow, TextField, PrimaryButton, IconButton, EmptyState } from './SharedUI';
 
 export default function AccountSettings({ data, updateAccount, addTerm, updateTerm, deleteTerm, clearAllTerms, resetAllData }) {
@@ -60,21 +60,21 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-        <div style={{ flex: 2, minWidth: 320 }}>
+      <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'stretch' }}>
+        <div style={{ flex: 2, minWidth: 320, display: 'flex', flexDirection: 'column' }}>
           <Eyebrow>Account Settings</Eyebrow>
-          <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: '#22392D' }}>Your Info</h1>
-          <div className="gt-card" style={{ padding: 18, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>Your Info</h1>
+          <div className="gt-card" style={{ padding: 18, display: 'flex', gap: 12, flexWrap: 'wrap', flex: 1 }}>
             <TextField label="Student ID" value={data.account.studentId} onChange={v => updateAccount({ studentId: v })} placeholder="2023-00123" mono />
             <TextField label="First Name" value={data.account.firstName} onChange={v => updateAccount({ firstName: v })} placeholder="Juan" />
             <TextField label="Middle Name" value={data.account.middleName} onChange={v => updateAccount({ middleName: v })} placeholder="Santos" />
             <TextField label="Last Name" value={data.account.lastName} onChange={v => updateAccount({ lastName: v })} placeholder="Dela Cruz" />
             <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 140 }}>
-              <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Gender</span>
+              <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Gender</span>
               <select
                 value={data.account.gender || ''}
                 onChange={e => updateAccount({ gender: e.target.value })}
-                style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 14, background: '#FCFBF7', color: '#2A2E28' }}
+                style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
               >
                 <option value="">Prefer not to say</option>
                 <option value="Male">Male</option>
@@ -83,13 +83,24 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
               </select>
             </label>
             <TextField label="Birthday" type="date" value={data.account.birthday} onChange={v => updateAccount({ birthday: v })} mono />
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, flexBasis: '100%', width: '100%' }}>
+              <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Program</span>
+              <select
+                value={data.account.program || ''}
+                onChange={e => updateAccount({ program: e.target.value })}
+                style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
+              >
+                <option value="">None</option>
+                {MAPUA_PROGRAMS.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </label>
           </div>
         </div>
 
-        <div style={{ flex: 1, minWidth: 220 }}>
+        <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column' }}>
           <Eyebrow>Ambition</Eyebrow>
-          <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: '#22392D' }}>GWA</h1>
-          <div className="gt-card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>GWA</h1>
+          <div className="gt-card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
             <TextField
               label={`Target GWA (${(data.account.gradingSystem || 'highest-1') === 'highest-1' ? '1.00 best' : '5.00 best'})`}
               value={data.account.goalGWA || ''}
@@ -112,11 +123,11 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
         <Eyebrow>Grading</Eyebrow>
         <div className="gt-card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: 6, maxWidth: 320 }}>
-            <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Grading System</span>
+            <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Grading System</span>
             <select
               value={data.account.gradingSystem || 'highest-1'}
               onChange={e => updateAccount({ gradingSystem: e.target.value })}
-              style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 14, background: '#FCFBF7', color: '#2A2E28' }}
+              style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
             >
               <option value="highest-1">1.00 is the highest grade</option>
               <option value="highest-5">5.00 is the highest grade</option>
@@ -124,14 +135,14 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
           </label>
 
           <div>
-            <div className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600, marginBottom: 8 }}>
+            <div className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, marginBottom: 8 }}>
               Grade Conversion Table
             </div>
             {gradeTable.length === 0 ? (
-              <div style={{ fontSize: 13, color: '#B0AA98', marginBottom: 10 }}>No conversion rows yet — add one below (e.g. 80.00–84.99% → 1.75).</div>
+              <div style={{ fontSize: 13, color: 'var(--c-text-placeholder)', marginBottom: 10 }}>No conversion rows yet — add one below (e.g. 80.00–84.99% → 1.75).</div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10, overflowX: 'auto' }}>
-                <div className="gt-mono" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600, minWidth: 366 }}>
+                <div className="gt-mono" style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, minWidth: 366 }}>
                   <span style={{ width: 90, textAlign: 'center' }}>Lowest %</span>
                   <span style={{ width: 14 }} />
                   <span style={{ width: 90, textAlign: 'center' }}>Highest %</span>
@@ -143,19 +154,19 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                     <input
                       type="text" inputMode="decimal" value={row.low} placeholder="80.00"
                       onChange={e => updateGradeRow(row.id, { low: e.target.value.replace(/[^0-9.]/g, '') })}
-                      className="gt-mono" style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 13, textAlign: 'center', background: '#FCFBF7', color: '#2A2E28' }}
+                      className="gt-mono" style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 13, textAlign: 'center', background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                     />
-                    <span style={{ fontSize: 13, color: '#8A8A7E' }}>–</span>
+                    <span style={{ fontSize: 13, color: 'var(--c-text-faint)' }}>–</span>
                     <input
                       type="text" inputMode="decimal" value={row.high} placeholder="84.99"
                       onChange={e => updateGradeRow(row.id, { high: e.target.value.replace(/[^0-9.]/g, '') })}
-                      className="gt-mono" style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 13, textAlign: 'center', background: '#FCFBF7', color: '#2A2E28' }}
+                      className="gt-mono" style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 13, textAlign: 'center', background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                     />
-                    <span style={{ fontSize: 13, color: '#8A8A7E' }}>=</span>
+                    <span style={{ fontSize: 13, color: 'var(--c-text-faint)' }}>=</span>
                     <input
                       type="text" inputMode="decimal" value={row.grade} placeholder="1.75"
                       onChange={e => updateGradeRow(row.id, { grade: e.target.value.replace(/[^0-9.]/g, '') })}
-                      className="gt-mono" style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid #DDD6C4', fontSize: 13, textAlign: 'center', background: '#FCFBF7', color: '#2A2E28' }}
+                      className="gt-mono" style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid var(--c-border-strong)', fontSize: 13, textAlign: 'center', background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                     />
                     <IconButton icon={Trash2} onClick={() => deleteGradeRow(row.id)} title="Remove row" danger />
                   </div>
@@ -163,11 +174,11 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
               </div>
             )}
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-              <PrimaryButton onClick={addGradeRow} icon={Plus} style={{ background: 'transparent', border: '1.5px dashed #B7AE9C', color: '#4A5048' }}>Add Row</PrimaryButton>
+              <PrimaryButton onClick={addGradeRow} icon={Plus} style={{ background: 'transparent', border: '1.5px dashed var(--c-text-disabled)', color: 'var(--c-text)' }}>Add Row</PrimaryButton>
               {gradeTable.length > 0 && (
                 confirmClearGrades ? (
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    <span style={{ fontSize: 12.5, color: '#B23A2E' }}>Clear all rows?</span>
+                    <span style={{ fontSize: 12.5, color: 'var(--c-danger)' }}>Clear all rows?</span>
                     <IconButton icon={Check} onClick={clearGradeTable} title="Confirm" danger />
                     <IconButton icon={X} onClick={() => setConfirmClearGrades(false)} title="Cancel" />
                   </div>
@@ -177,8 +188,8 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                     className="gt-mono"
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 16px',
-                      borderRadius: 8, border: '1.5px solid #E3DCC9', background: 'transparent',
-                      color: '#B23A2E', fontSize: 12.5, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
+                      borderRadius: 8, border: '1.5px solid var(--c-border)', background: 'transparent',
+                      color: 'var(--c-danger)', fontSize: 12.5, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
                     }}
                   >
                     <Trash2 size={14} /> Clear All
@@ -197,7 +208,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
           {data.terms.length > 0 && (
             confirmClearTerms ? (
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <span style={{ fontSize: 12.5, color: '#B23A2E' }}>Clear all terms?</span>
+                <span style={{ fontSize: 12.5, color: 'var(--c-danger)' }}>Clear all terms?</span>
                 <IconButton icon={Check} onClick={() => { clearAllTerms(); setConfirmClearTerms(false); }} title="Confirm" danger />
                 <IconButton icon={X} onClick={() => setConfirmClearTerms(false)} title="Cancel" />
               </div>
@@ -207,8 +218,8 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                 className="gt-mono"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px',
-                  borderRadius: 8, border: '1.5px solid #E3DCC9', background: 'transparent',
-                  color: '#B23A2E', fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
+                  borderRadius: 8, border: '1.5px solid var(--c-border)', background: 'transparent',
+                  color: 'var(--c-danger)', fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
                 }}
               >
                 <Trash2 size={14} /> Clear All
@@ -220,8 +231,8 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
             className="gt-mono"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px',
-              borderRadius: 8, border: '1.5px solid #DDD6C4', background: showPreset ? '#EFF3EC' : '#FCFBF7',
-              color: '#2D5240', fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
+              borderRadius: 8, border: '1.5px solid var(--c-border-strong)', background: showPreset ? 'var(--c-surface-selected)' : 'var(--c-surface)',
+              color: 'var(--c-forest)', fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
             }}
           >
             <Sparkles size={14} /> Use a Preset {showPreset ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -233,21 +244,21 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
               <TextField label="Start Date" type="date" value={preset.startDate} onChange={v => setPreset({ ...preset, startDate: v })} mono />
               <label style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 140 }}>
-                <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Years</span>
+                <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Years</span>
                 <select
                   value={preset.years}
                   onChange={e => setPreset({ ...preset, years: e.target.value })}
-                  style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 14, background: '#FCFBF7', color: '#2A2E28' }}
+                  style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                 >
                   {[1, 2, 3, 4, 5, 6].map(y => <option key={y} value={y}>{y} year{y === 1 ? '' : 's'}</option>)}
                 </select>
               </label>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 160 }}>
-                <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7C8A80', fontWeight: 600 }}>Terms per Year</span>
+                <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Terms per Year</span>
                 <select
                   value={preset.termsPerYear}
                   onChange={e => setPreset({ ...preset, termsPerYear: e.target.value })}
-                  style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid #DDD6C4', fontSize: 14, background: '#FCFBF7', color: '#2A2E28' }}
+                  style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                 >
                   <option value={2}>2 — Semester</option>
                   <option value={3}>3 — Trimester</option>
@@ -256,7 +267,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
               </label>
               <PrimaryButton onClick={generatePreset} icon={Sparkles} style={{ opacity: canGeneratePreset ? 1 : 0.5 }}>Generate Terms</PrimaryButton>
             </div>
-            <div style={{ fontSize: 12, color: '#8A8A7E', marginTop: 10 }}>
+            <div style={{ fontSize: 12, color: 'var(--c-text-faint)', marginTop: 10 }}>
               This will create {Number(preset.years) * Number(preset.termsPerYear)} term{Number(preset.years) * Number(preset.termsPerYear) === 1 ? '' : 's'} starting from the date above, named automatically (e.g. "1st Semester SY 2026-2027").
             </div>
           </div>
@@ -282,7 +293,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                 .map(t => {
                   const isCurrent = currentTerm && currentTerm.id === t.id;
                   return (
-                    <div key={t.id} className="gt-card" style={{ padding: 14, borderLeft: isCurrent ? '5px solid #B8860B' : '5px solid transparent' }}>
+                    <div key={t.id} className="gt-card" style={{ padding: 14, borderLeft: isCurrent ? '5px solid var(--c-gold)' : '5px solid transparent' }}>
                       {editingId === t.id ? (
                         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
                           <TextField label="Term Name" value={editForm.name} onChange={v => setEditForm({ ...editForm, name: v })} />
@@ -296,24 +307,24 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                       ) : (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
                           <div style={{ flex: 1, minWidth: 140 }}>
-                            <div className="gt-serif" style={{ fontSize: 16, color: '#2A2E28', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div className="gt-serif" style={{ fontSize: 16, color: 'var(--c-ink-soft)', display: 'flex', alignItems: 'center', gap: 8 }}>
                               {t.name}
                               {isCurrent && (
-                                <span className="gt-mono" style={{ fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', background: '#F5E7BE', color: '#8A6A0D', padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>Current</span>
+                                <span className="gt-mono" style={{ fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'var(--c-gold-tint)', color: 'var(--c-gold-dark)', padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>Current</span>
                               )}
                             </div>
-                            <div className="gt-mono" style={{ fontSize: 12, color: '#8A8A7E', marginTop: 2 }}>{formatDate(t.startDate)} – {formatDate(t.endDate)}</div>
+                            <div className="gt-mono" style={{ fontSize: 12, color: 'var(--c-text-faint)', marginTop: 2 }}>{formatDate(t.startDate)} – {formatDate(t.endDate)}</div>
                           </div>
                           {confirmDeleteId === t.id ? (
                             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                              <span style={{ fontSize: 12.5, color: '#B23A2E' }}>Delete?</span>
+                              <span style={{ fontSize: 12.5, color: 'var(--c-danger)' }}>Delete?</span>
                               <IconButton icon={Check} onClick={() => { deleteTerm(t.id); setConfirmDeleteId(null); }} title="Confirm" danger />
                               <IconButton icon={X} onClick={() => setConfirmDeleteId(null)} title="Cancel" />
                             </div>
                           ) : (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                               {termDurationDays(t) !== null && (
-                                <span className="gt-mono" style={{ fontSize: 11, color: '#7C8A80', background: 'rgba(0,0,0,0.04)', padding: '3px 9px', borderRadius: 20, fontWeight: 600 }}>
+                                <span className="gt-mono" style={{ fontSize: 11, color: 'var(--c-text-muted)', background: 'rgba(0,0,0,0.04)', padding: '3px 9px', borderRadius: 20, fontWeight: 600 }}>
                                   {termDurationDays(t)} day{termDurationDays(t) === 1 ? '' : 's'}
                                 </span>
                               )}
@@ -335,16 +346,16 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
 
       <div>
         <Eyebrow>Danger Zone</Eyebrow>
-        <div className="gt-card" style={{ padding: 18, border: '1.5px solid #E3B8B0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+        <div className="gt-card" style={{ padding: 18, border: '1.5px solid var(--c-danger-tint)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           <div>
-            <div className="gt-serif" style={{ fontSize: 16, color: '#2A2E28' }}>Clear All Data</div>
-            <div style={{ fontSize: 12.5, color: '#8A8A7E', marginTop: 2 }}>
+            <div className="gt-serif" style={{ fontSize: 16, color: 'var(--c-ink-soft)' }}>Clear All Data</div>
+            <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)', marginTop: 2 }}>
               Permanently erases your profile, terms, courses, schedule, grades, and assessments. This cannot be undone.
             </div>
           </div>
           {confirmResetAll ? (
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <span style={{ fontSize: 12.5, color: '#B23A2E', fontWeight: 600 }}>Are you sure?</span>
+              <span style={{ fontSize: 12.5, color: 'var(--c-danger)', fontWeight: 600 }}>Are you sure?</span>
               <IconButton icon={Check} onClick={() => { resetAllData(); setConfirmResetAll(false); }} title="Confirm" danger />
               <IconButton icon={X} onClick={() => setConfirmResetAll(false)} title="Cancel" />
             </div>
@@ -354,7 +365,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
               className="gt-mono"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 16px',
-                borderRadius: 8, border: 'none', background: '#B23A2E', color: '#FCFBF7',
+                borderRadius: 8, border: 'none', background: 'var(--c-danger)', color: 'var(--c-surface)',
                 fontSize: 12.5, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
               }}
             >
@@ -364,7 +375,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
         </div>
       </div>
 
-      <div className="gt-mono" style={{ textAlign: 'center', fontSize: 11, color: '#B0AA98', paddingTop: 4, paddingBottom: 8 }}>
+      <div className="gt-mono" style={{ textAlign: 'center', fontSize: 11, color: 'var(--c-text-placeholder)', paddingTop: 4, paddingBottom: 8 }}>
         Gradebook v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}
       </div>
     </div>
