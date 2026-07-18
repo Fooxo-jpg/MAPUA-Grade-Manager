@@ -1,0 +1,294 @@
+export const STORAGE_KEY = 'grade-tracker-data-v1';
+export const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+export const COURSE_COLORS = [
+  { name: 'Ledger',      hex: '#2D5240' },
+  { name: 'Pen Red',     hex: '#B23A2E' },
+  { name: 'Highlighter', hex: '#B8860B' },
+  { name: 'Ink Blue',    hex: '#3B5BA9' },
+  { name: 'Plum',        hex: '#7A4FA3' },
+  { name: 'Manila',      hex: '#C97B3D' },
+];
+
+export function uid() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 'id-' + Math.random().toString(36).slice(2) + Date.now();
+}
+
+export function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+export function getCurrentTerm(terms) {
+  const t = todayStr();
+  return (terms || []).find(term => term.startDate && term.endDate && term.startDate <= t && t <= term.endDate) || null;
+}
+
+export function isTermEnded(term) {
+  if (!term || !term.endDate) return false;
+  return term.endDate < todayStr();
+}
+
+export function hasTermStarted(term) {
+  if (!term || !term.startDate) return false;
+  return term.startDate <= todayStr();
+}
+
+// A grade counts as "passing" for unit-tracking purposes: 1.00–3.00 (or P) on the
+// standard scale, or 3.00–5.00 (or P) when the account uses the reversed "5.00 is highest" scale.
+export function isPassingGrade(value, account) {
+  if (value === undefined || value === null || value === '') return false;
+  if (isSpecialGrade(value)) return String(value).trim().toUpperCase() === 'P';
+  const num = parseFloat(value);
+  if (isNaN(num)) return false;
+  const highestIsOne = !account || account.gradingSystem !== 'highest-5';
+  return highestIsOne ? (num >= 1 && num <= 3) : (num >= 3 && num <= 5);
+}
+
+// Resolves a course's lifecycle status relative to the term(s) it's assigned to:
+// 'taken' (an ended term + passing grade), 'current' (a term is ongoing), 'not-yet' (only future terms), or null.
+// Scans every term the course appears in (not just the first match) so a course reused across
+// multiple terms — common for generic "Elective"/"Specialization" slots — still resolves correctly.
+export function getCourseStatus(course, terms, termCourses, grades, assessments, account) {
+  const termIds = Object.keys(termCourses || {}).filter(tid => ((termCourses || {})[tid] || []).includes(course.id));
+  const matchingTerms = termIds.map(tid => (terms || []).find(t => t.id === tid)).filter(Boolean);
+  if (matchingTerms.length === 0) return null;
+  const today = todayStr();
+
+  if (matchingTerms.some(term => term.startDate && term.startDate <= today && (!term.endDate || today <= term.endDate))) {
+    return 'current';
+  }
+  const takenSomewhere = matchingTerms.some(term => {
+    if (!term.endDate || term.endDate >= today) return false;
+    const effective = getEffectiveGrade(term.id, course.id, grades, assessments, account, course);
+    return isPassingGrade(effective.value, account);
+  });
+  if (takenSomewhere) return 'taken';
+  if (matchingTerms.some(term => term.startDate && term.startDate > today)) return 'not-yet';
+  return null;
+}
+
+export function findCourseTermId(termCourses, courseId, excludeTermId) {
+  const tid = Object.keys(termCourses || {}).find(id => id !== excludeTermId && (termCourses[id] || []).includes(courseId));
+  return tid || null;
+}
+
+export function formatDate(d) {
+  if (!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export function termDurationDays(term) {
+  if (!term || !term.startDate || !term.endDate) return null;
+  const start = new Date(term.startDate + 'T00:00:00');
+  const end = new Date(term.endDate + 'T00:00:00');
+  const diff = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+  return diff > 0 ? diff : null;
+}
+
+export const COURSE_TYPES = [
+  { name: 'Core', color: '#2D5240' },
+  { name: 'Specialization', color: '#3B5BA9' },
+  { name: 'Elective', color: '#C97B3D' },
+];
+
+export const COURSE_TYPE_ORDER = ['Core', 'Elective', 'Specialization'];
+
+export const SPECIAL_GRADES = ['P', 'INC'];
+
+// The only grade points that can be entered as a final grade — matches the standard
+// 1.00 (highest) – 5.00 (fail) scale. P/INC are handled separately as special grades.
+export const GRADE_SCALE = ['1.00', '1.25', '1.50', '1.75', '2.00', '2.25', '2.50', '2.75', '3.00', '5.00'];
+
+export function isSpecialGrade(raw) {
+  if (raw === undefined || raw === null) return false;
+  const v = String(raw).trim().toUpperCase();
+  return SPECIAL_GRADES.includes(v);
+}
+
+// Resolves the grade that actually counts for a course in a term:
+// 1. A manually entered/overridden value in `grades` always wins (numeric or P/INC).
+// 2. Otherwise, if an assessment log exists and yields a computed grade point, use that.
+// 3. Otherwise there is no effective grade yet.
+export function getEffectiveGrade(termId, courseId, grades, assessments, account, course) {
+  const override = grades[termId] && grades[termId][courseId];
+  if (override !== undefined && override !== '') {
+    return { value: override, isOverride: true, isComputed: false };
+  }
+  const list = assessments && assessments[termId] && assessments[termId][courseId];
+  if (list && list.length > 0) {
+    const { percent } = computeAssessmentStats(list, course && course.categories);
+    const gradePoint = percentToGradePoint(account && account.gradeTable, percent);
+    if (gradePoint !== null) {
+      return { value: gradePoint, isOverride: false, isComputed: true, percent };
+    }
+    return { value: undefined, isOverride: false, isComputed: false, percent };
+  }
+  return { value: undefined, isOverride: false, isComputed: false };
+}
+
+export function computeTermStats(termId, grades, courses, termCourses, assessments = {}, account = {}) {
+  const ids = termCourses[termId] || [];
+  let sumWeighted = 0, sumUnits = 0, totalUnits = 0;
+  ids.forEach(id => {
+    const course = courses.find(c => c.id === id);
+    if (!course) return;
+    const units = parseFloat(course.units) || 0;
+    totalUnits += units;
+    const effective = getEffectiveGrade(termId, id, grades, assessments, account, course);
+    if (effective.value === undefined || effective.value === '') return;
+    if (course.unitsConsidered === false) return; // explicitly excluded via the Manage Courses checkbox
+    const gradeNum = parseFloat(effective.value);
+    if (!isNaN(gradeNum) && units > 0) {
+      sumWeighted += gradeNum * units;
+      sumUnits += units;
+    }
+  });
+  return {
+    gwa: sumUnits > 0 ? sumWeighted / sumUnits : null,
+    unitsConsidered: sumUnits,
+    totalUnits,
+  };
+}
+
+// Some term naming conventions carry a hard cap on total units that can be assigned to them.
+export const UNIT_LIMIT_RULES = [
+  { match: 'trisem', limit: 21 },
+  { match: 'quarterm', limit: 18 },
+];
+
+export function getUnitLimit(term) {
+  if (!term || !term.name) return null;
+  const name = term.name.toLowerCase();
+  const rule = UNIT_LIMIT_RULES.find(r => name.includes(r.match));
+  return rule ? rule.limit : null;
+}
+
+export function sumAssignedUnits(termId, courses, termCourses) {
+  const ids = (termCourses && termCourses[termId]) || [];
+  return ids.reduce((sum, id) => {
+    const course = courses.find(c => c.id === id);
+    return sum + (course ? (parseFloat(course.units) || 0) : 0);
+  }, 0);
+}
+
+export function computeGWA(termId, grades, courses, termCourses, assessments = {}, account = {}) {
+  return computeTermStats(termId, grades, courses, termCourses, assessments, account).gwa;
+}
+
+// Aggregates weighted grade points across every term that has ended, giving a single
+// cumulative GWA + units-considered figure (used to project the grade needed going forward).
+export function computeCumulativeStats(terms, grades, courses, termCourses, assessments = {}, account = {}) {
+  let sumWeighted = 0, sumUnits = 0;
+  (terms || []).forEach(term => {
+    if (!isTermEnded(term)) return;
+    const stats = computeTermStats(term.id, grades, courses, termCourses, assessments, account);
+    if (stats.unitsConsidered > 0) {
+      sumWeighted += stats.gwa * stats.unitsConsidered;
+      sumUnits += stats.unitsConsidered;
+    }
+  });
+  return { gwa: sumUnits > 0 ? sumWeighted / sumUnits : null, unitsConsidered: sumUnits };
+}
+
+export function timeToMinutes(t) {
+  if (!t) return 0;
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+export function formatTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+export const defaultData = {
+  account: {
+    studentId: '', firstName: '', middleName: '', lastName: '', gender: '', birthday: '',
+    gradingSystem: 'highest-1',
+    gradeTable: [],
+    requiredUnits: '',
+    goalGWA: '',
+  },
+  terms: [],
+  courses: [],
+  termCourses: {},
+  schedule: [],
+  grades: {},
+  assessments: {},
+};
+
+export const TERM_LABELS = { 2: 'Semester', 3: 'Trimester', 4: 'Quarter' };
+
+export function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+export function addMonths(date, months) {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+
+export function toISODate(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+export function generateTerms({ startDate, years, termsPerYear }) {
+  const label = TERM_LABELS[termsPerYear] || 'Term';
+  const monthsPerTerm = 12 / termsPerYear;
+  const totalTerms = years * termsPerYear;
+  const start = new Date(startDate + 'T00:00:00');
+  const startYear = start.getFullYear();
+  const terms = [];
+  for (let i = 0; i < totalTerms; i++) {
+    const termStart = addMonths(start, i * monthsPerTerm);
+    const termEnd = addMonths(start, (i + 1) * monthsPerTerm);
+    termEnd.setDate(termEnd.getDate() - 1);
+    const yearIndex = Math.floor(i / termsPerYear);
+    const termInYear = (i % termsPerYear) + 1;
+    const name = `${ordinal(termInYear)} ${label} SY ${startYear + yearIndex}-${startYear + yearIndex + 1}`;
+    terms.push({ id: uid(), name, startDate: toISODate(termStart), endDate: toISODate(termEnd) });
+  }
+  return terms;
+}
+
+export function percentToGradePoint(gradeTable, percent) {
+  if (percent === null || percent === undefined || isNaN(percent) || !gradeTable || gradeTable.length === 0) return null;
+  const rows = gradeTable
+    .filter(r => r.low !== '' && r.high !== '' && r.grade !== '' && r.low !== undefined && r.high !== undefined && r.grade !== undefined)
+    .map(r => ({ low: parseFloat(r.low), high: parseFloat(r.high), grade: parseFloat(r.grade) }))
+    .filter(r => !isNaN(r.low) && !isNaN(r.high) && !isNaN(r.grade));
+  if (rows.length === 0) return null;
+  const match = rows.find(r => percent >= Math.min(r.low, r.high) && percent <= Math.max(r.low, r.high));
+  if (match) return match.grade;
+  const sorted = rows.slice().sort((a, b) => Math.min(a.low, a.high) - Math.min(b.low, b.high));
+  if (percent > Math.max(sorted[sorted.length - 1].low, sorted[sorted.length - 1].high)) return sorted[sorted.length - 1].grade;
+  if (percent < Math.min(sorted[0].low, sorted[0].high)) return sorted[0].grade;
+  return null;
+}
+
+export function computeAssessmentStats(list, categories) {
+  let weightedSum = 0, weightSum = 0;
+  (list || []).forEach(a => {
+    const raw = parseFloat(a.raw), total = parseFloat(a.total);
+    let weight = parseFloat(a.weight);
+    if (categories && a.categoryId) {
+      const cat = categories.find(c => c.id === a.categoryId);
+      if (cat) weight = parseFloat(cat.weight);
+    }
+    if (!isNaN(raw) && !isNaN(total) && total > 0 && !isNaN(weight) && weight > 0) {
+      const pct = (raw / total) * 100;
+      weightedSum += pct * weight;
+      weightSum += weight;
+    }
+  });
+  return { percent: weightSum > 0 ? weightedSum / weightSum : null, weightSum };
+}
