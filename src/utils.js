@@ -10,6 +10,24 @@ export const COURSE_COLORS = [
   { name: 'Manila',      hex: '#C97B3D' },
 ];
 
+// Preset color schemes for the sidebar (side panel). Each defines the
+// top-to-bottom gradient and the accent used for the active nav item / logo.
+export const SIDEBAR_THEMES = [
+  { id: 'forest',   name: 'Forest & Gold',     from: '#22392D', to: '#1c3225', accent: '#B8860B', accentBright: '#F0C929' },
+  { id: 'navy',     name: 'Navy & Silver',     from: '#16213A', to: '#0F1830', accent: '#6E8FC2', accentBright: '#A9C2E8' },
+  { id: 'plum',     name: 'Plum & Rose',       from: '#2E1F3A', to: '#20142B', accent: '#B472A0', accentBright: '#E3A6C7' },
+  { id: 'slate',    name: 'Slate & Teal',      from: '#1E2A2C', to: '#141D1E', accent: '#4FA3AC', accentBright: '#8FD1D9' },
+  { id: 'burgundy', name: 'Burgundy & Copper', from: '#3A1A1E', to: '#270F12', accent: '#C17A3E', accentBright: '#E0A15C' },
+  { id: 'charcoal', name: 'Charcoal & Mint',   from: '#20221F', to: '#141613', accent: '#4FA575', accentBright: '#7FCB9E' },
+];
+
+// Fixed MAPUA-style grade scale — permanent, never added to or removed from.
+export const GRADE_LEVELS = [1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 5.00];
+
+function defaultGradeTable() {
+  return GRADE_LEVELS.map((g, i) => ({ id: 'rank-' + i, low: '', high: '', grade: g.toFixed(2) }));
+}
+
 export function uid() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
   return 'id-' + Math.random().toString(36).slice(2) + Date.now();
@@ -278,9 +296,11 @@ export const defaultData = {
   account: {
     studentId: '', firstName: '', middleName: '', lastName: '', gender: '', birthday: '',
     gradingSystem: 'highest-1',
-    gradeTable: [],
+    gradeTable: defaultGradeTable(),
     requiredUnits: '',
     goalGWA: '',
+    theme: 'light',
+    sidebarTheme: 'forest',
   },
   terms: [],
   courses: [],

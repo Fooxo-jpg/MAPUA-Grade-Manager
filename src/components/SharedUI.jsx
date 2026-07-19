@@ -156,6 +156,21 @@ export function TextField({ label, value, onChange, placeholder, type = 'text', 
   );
 }
 
+export function SelectField({ label, value, onChange, children, mono = false, style }) {
+  return (
+    <label className="gt-field" style={style}>
+      <span className="gt-field-label">{label}</span>
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className={`gt-select${mono ? ' gt-mono' : ''}`}
+      >
+        {children}
+      </select>
+    </label>
+  );
+}
+
 export function PrimaryButton({ onClick, children, icon: Icon, style, disabled, title }) {
   return (
     <button

@@ -58,12 +58,65 @@
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --t-fast: 120ms;
   --t-med: 200ms;
+
+  /* sidebar (side panel) customization — overridden inline per the chosen preset */
+  --c-sidebar-from: var(--c-forest-dark);
+  --c-sidebar-to: #1c3225;
+  --c-sidebar-accent: var(--c-gold);
+  --c-sidebar-accent-bright: var(--c-gold-bright);
+}
+
+/* ============================================================
+   DARK THEME
+   Same warm, ledger-inspired identity — deep charcoal-green
+   surfaces with parchment ink and the same gold accent — just
+   inverted for low-light reading.
+   ============================================================ */
+:root[data-theme='dark'] {
+  --c-bg: #161B16;
+  --c-bg-alt: #1B211B;
+  --c-surface: #1F251F;
+  --c-surface-disabled: #262C25;
+  --c-surface-selected: #263329;
+  --c-divider: #2A302A;
+
+  --c-border: #313830;
+  --c-border-strong: #3B423A;
+
+  --c-ink: #F3EFE3;
+  --c-ink-soft: #E9E4D4;
+  --c-text: #C9C4B2;
+  --c-text-muted: #9B9787;
+  --c-text-faint: #86826F;
+  --c-text-placeholder: #666255;
+  --c-text-disabled: #59564A;
+  --c-white: #FFFFFF;
+
+  --c-forest: #3E7A55;
+  --c-forest-dark: #10150F;
+  --c-forest-hover: #468761;
+  --c-on-forest: #F5F7F3;
+  --c-gold: #D8A73E;
+  --c-gold-dark: #B8860B;
+  --c-gold-bright: #F0C929;
+  --c-gold-tint: rgba(240, 201, 41, 0.16);
+  --c-link: #86A8E8;
+  --c-danger: #E0685A;
+  --c-danger-tint: #6B3630;
+  --c-danger-bg: #2E1E1B;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.55);
+  --shadow-focus: 0 0 0 3px rgba(62, 122, 85, 0.35);
+  --shadow-focus-danger: 0 0 0 3px rgba(224, 104, 90, 0.3);
 }
 
 /* ============================================================
    BASE / RESET
    ============================================================ */
-html, body { height: 100%; margin: 0; overflow: hidden; background: var(--c-bg); }
+html, body { height: 100%; margin: 0; overflow: hidden; background: var(--c-bg); transition: background var(--t-med) var(--ease); }
 #root { height: 100%; }
 * { box-sizing: border-box; }
 
@@ -194,6 +247,13 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
 .gt-btn-danger:hover:not(:disabled) { background: #9c3126; box-shadow: var(--shadow-sm); }
 .gt-btn-danger:disabled { background: var(--c-danger-tint); cursor: not-allowed; box-shadow: none; }
 
+.gt-btn-outline { padding: 9px 15px; background: var(--c-surface); color: var(--c-forest); border: 1.5px solid var(--c-border-strong); }
+.gt-btn-outline:hover:not(:disabled) { background: var(--c-bg-alt); border-color: var(--c-text-placeholder); }
+.gt-btn-outline--active { background: var(--c-surface-selected); }
+
+.gt-btn-outline-danger { padding: 9px 15px; background: transparent; color: var(--c-danger); border: 1.5px solid var(--c-border); }
+.gt-btn-outline-danger:hover:not(:disabled) { background: var(--c-danger-bg); border-color: var(--c-danger-tint); }
+
 .gt-icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 30px; border-radius: var(--r-sm); border: 1.5px solid var(--c-border);
@@ -237,12 +297,42 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
 .gt-empty-state-subtitle { font-size: 13.5px; color: var(--c-text-faint); }
 
 /* ============================================================
+   SETTINGS PAGE — shared section header + control styles so every
+   card on Account Settings reads as one cohesive page.
+   ============================================================ */
+.gt-settings-section { display: flex; flex-direction: column; gap: 12px; }
+.gt-settings-section-head { display: flex; flex-direction: column; gap: 3px; }
+.gt-settings-heading { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; color: var(--c-ink); margin: 0; }
+.gt-settings-desc { font-size: 12.5px; color: var(--c-text-faint); line-height: 1.5; max-width: 640px; margin: 0; }
+
+.gt-mode-toggle { display: inline-flex; padding: 3px; gap: 3px; background: var(--c-bg-alt); border: 1.5px solid var(--c-border); border-radius: 10px; }
+.gt-mode-toggle-btn {
+  display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 7px; border: none;
+  background: transparent; color: var(--c-text-muted); cursor: pointer;
+  font-size: 12.5px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.gt-mode-toggle-btn:hover { color: var(--c-ink-soft); }
+.gt-mode-toggle-btn--active { background: var(--c-surface); color: var(--c-forest); box-shadow: var(--shadow-xs); }
+.gt-mode-toggle-btn--active:hover { color: var(--c-forest); }
+
+.gt-swatch-btn {
+  width: 46px; height: 34px; border-radius: 8px; cursor: pointer; padding: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border: 2.5px solid transparent; box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.gt-swatch-btn:hover { transform: scale(1.06); }
+.gt-swatch-btn--selected { border-color: var(--c-ink-soft); box-shadow: 0 0 0 1px rgba(0,0,0,0.08), var(--shadow-sm); }
+.gt-swatch-dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.35); }
+
+/* ============================================================
    SIDEBAR
    ============================================================ */
 .gt-sidebar {
-  background: linear-gradient(180deg, var(--c-forest-dark) 0%, #1c3225 100%);
+  background: linear-gradient(180deg, var(--c-sidebar-from) 0%, var(--c-sidebar-to) 100%);
   color: #F0EEE4; display: flex; flex-direction: column; flex: 0 0 220px; width: 220px; min-width: 220px; max-width: 220px;
-  transition: flex-basis var(--t-med) var(--ease), width var(--t-med) var(--ease), min-width var(--t-med) var(--ease), max-width var(--t-med) var(--ease);
+  transition: flex-basis var(--t-med) var(--ease), width var(--t-med) var(--ease), min-width var(--t-med) var(--ease), max-width var(--t-med) var(--ease), background var(--t-med) var(--ease);
   overflow: hidden; box-shadow: var(--shadow-lg);
   position: relative; z-index: 5;
 }
@@ -253,9 +343,9 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
 
 .gt-logo-icon-wrap {
   position: relative; width: 34px; height: 34px; border-radius: var(--r-md);
-  background: linear-gradient(145deg, var(--c-gold-bright), var(--c-gold));
+  background: linear-gradient(145deg, var(--c-sidebar-accent-bright), var(--c-sidebar-accent));
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--c-forest-dark);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm); transition: background var(--t-med) var(--ease);
 }
 .gt-logo-icon { transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease); }
 .gt-logo-chevron { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--t-fast) var(--ease); color: var(--c-forest-dark); }
@@ -276,8 +366,11 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), padding-left var(--t-fast) var(--ease);
 }
 .gt-nav-btn:hover { background: rgba(255,255,255,0.07); color: #F0EEE4; }
-.gt-nav-btn-active { background: rgba(240,201,41,0.16); color: var(--c-gold-bright); border-left: 3px solid var(--c-gold-bright); font-weight: 600; }
-.gt-nav-btn-active:hover { background: rgba(240,201,41,0.20); color: var(--c-gold-bright); }
+.gt-nav-btn-active {
+  background: color-mix(in srgb, var(--c-sidebar-accent-bright) 16%, transparent);
+  color: var(--c-sidebar-accent-bright); border-left: 3px solid var(--c-sidebar-accent-bright); font-weight: 600;
+}
+.gt-nav-btn-active:hover { background: color-mix(in srgb, var(--c-sidebar-accent-bright) 22%, transparent); color: var(--c-sidebar-accent-bright); }
 .gt-sidebar-collapsed .gt-nav-btn { justify-content: center; padding: 11px 0; }
 .gt-nav-label { white-space: nowrap; }
 .gt-sidebar-collapsed .gt-nav-label { display: none; }

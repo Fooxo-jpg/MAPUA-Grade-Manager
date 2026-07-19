@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { STORAGE_KEY, defaultData, findCourseTermId, uid } from './utils';
+import { STORAGE_KEY, defaultData, findCourseTermId, uid, SIDEBAR_THEMES } from './utils';
 
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -161,6 +161,19 @@ export default function App() {
 
   const studentName = [data.account.firstName, data.account.lastName].filter(Boolean).join(' ');
 
+  const theme = data.account.theme || 'light';
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const sidebarPreset = SIDEBAR_THEMES.find(t => t.id === (data.account.sidebarTheme || 'forest')) || SIDEBAR_THEMES[0];
+  const sidebarVars = {
+    '--c-sidebar-from': sidebarPreset.from,
+    '--c-sidebar-to': sidebarPreset.to,
+    '--c-sidebar-accent': sidebarPreset.accent,
+    '--c-sidebar-accent-bright': sidebarPreset.accentBright,
+  };
+
   if (!loaded) {
     return (
       <div style={{
@@ -178,7 +191,7 @@ export default function App() {
   }
 
   return (
-    <div className="gt-root" style={{ height: '100vh' }}>
+    <div className="gt-root" style={{ height: '100vh', ...sidebarVars }}>
       <Sidebar active={active} setActive={setActive} studentName={studentName} collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
       <div className="gt-main">
         {active === 'dashboard' && <Dashboard data={data} />}
