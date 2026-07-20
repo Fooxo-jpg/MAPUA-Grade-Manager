@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Plus, Check, X, ChevronUp, ChevronDown, Sparkles, CalendarRange, Pencil, Sun, Moon } from 'lucide-react';
-import { getCurrentTerm, uid, generateTerms, formatDate, termDurationDays, MAPUA_PROGRAMS, GRADE_LEVELS, SIDEBAR_THEMES } from '../utils';
+import { getCurrentTerm, uid, generateTerms, formatDate, termDurationDays, MAPUA_PROGRAMS, gradeLevelsFor, SIDEBAR_THEMES } from '../utils';
 import { Eyebrow, TextField, SelectField, PrimaryButton, IconButton, EmptyState } from './SharedUI';
-
-// Orders the fixed grade levels so the best grade is always shown first,
-// based on which grading system is selected (1.00 highest vs 5.00 highest).
-function orderedGradeLevels(gradingSystem) {
-  const levels = GRADE_LEVELS.slice();
-  return gradingSystem === 'highest-5' ? levels.reverse() : levels;
-}
 
 // Shared header used by every card on this page so the section rhythm stays
 // consistent: a small eyebrow label, a serif heading, and an optional note.
@@ -83,6 +76,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
   const [editForm, setEditForm] = useState(blankTerm);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
+  const [showAddTerm, setShowAddTerm] = useState(false);
   const [showPreset, setShowPreset] = useState(false);
   const [preset, setPreset] = useState({ startDate: '', years: 4, termsPerYear: 2 });
   const [confirmClearTerms, setConfirmClearTerms] = useState(false);
@@ -95,6 +89,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
     if (!canAddTerm) return;
     addTerm({ ...termForm, id: uid() });
     setTermForm(blankTerm);
+    setShowAddTerm(false);
   }
 
   function generatePreset() {
@@ -122,7 +117,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
   // each row's "Final Grade" according to the new best-to-worst order —
   // the low/high percentage ranges stay put in their row.
   useEffect(() => {
-    const order = orderedGradeLevels(gradingSystem);
+    const order = gradeLevelsFor(gradingSystem);
     const current = data.account.gradeTable || [];
     const synced = order.map((g, i) => {
       const existing = current[i];
@@ -190,7 +185,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
         </SettingsSection>
       </div>
 
-      <SettingsSection eyebrow="Appearance" title="Theme & Sidebar" description="Choose a light or dark reading mode, and pick the color scheme for the side panel.">
+      <SettingsSection eyebrow="Appearance" title="Theme & Accent" description="Choose a light or dark reading mode, and pick an accent color scheme used for the side panel and highlights throughout the app.">
         <div className="gt-card" style={{ padding: 20, display: 'flex', flexWrap: 'wrap', gap: 28 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 180 }}>
             <span className="gt-field-label">Color Mode</span>
@@ -249,7 +244,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                   <span style={{ fontSize: 13, color: 'var(--c-text-faint)' }}>=</span>
                   <div
                     className="gt-mono"
-                    style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid var(--c-border)', fontSize: 13, textAlign: 'center', background: 'var(--c-surface-selected)', color: 'var(--c-forest-dark)', fontWeight: 700 }}
+                    style={{ width: 90, padding: '8px 10px', borderRadius: 7, border: '1.5px solid var(--c-border)', fontSize: 13, textAlign: 'center', background: 'var(--c-surface-selected)', color: 'var(--c-ink)', fontWeight: 700 }}
                   >
                     {row.grade}
                   </div>
@@ -262,14 +257,13 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
 
       <SettingsSection eyebrow="Term Management" title="Terms">
         <div className="gt-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            <TextField label="Term Name" value={termForm.name} onChange={v => setTermForm({ ...termForm, name: v })} placeholder="1st Semester 2026-2027" />
-            <TextField label="Start Date" type="date" value={termForm.startDate} onChange={v => setTermForm({ ...termForm, startDate: v })} mono />
-            <TextField label="End Date" type="date" value={termForm.endDate} onChange={v => setTermForm({ ...termForm, endDate: v })} mono />
-            <PrimaryButton onClick={submitTerm} icon={Plus} style={{ opacity: canAddTerm ? 1 : 0.5 }}>Add Term</PrimaryButton>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap', borderTop: '1px solid var(--c-divider)', paddingTop: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setShowAddTerm(s => !s)}
+              className={`gt-mono gt-btn gt-btn-outline${showAddTerm ? ' gt-btn-outline--active' : ''}`}
+            >
+              <Plus size={14} /> Create New Term {showAddTerm ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
             <button
               onClick={() => setShowPreset(s => !s)}
               className={`gt-mono gt-btn gt-btn-outline${showPreset ? ' gt-btn-outline--active' : ''}`}
@@ -291,6 +285,14 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
             )}
           </div>
 
+          {showAddTerm && (
+            <div style={{ background: 'var(--c-bg-alt)', border: '1.5px solid var(--c-border)', borderRadius: 10, padding: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <TextField label="Term Name" value={termForm.name} onChange={v => setTermForm({ ...termForm, name: v })} placeholder="1st Semester 2026-2027" />
+              <TextField label="Start Date" type="date" value={termForm.startDate} onChange={v => setTermForm({ ...termForm, startDate: v })} mono />
+              <TextField label="End Date" type="date" value={termForm.endDate} onChange={v => setTermForm({ ...termForm, endDate: v })} mono />
+              <PrimaryButton onClick={submitTerm} icon={Plus} style={{ opacity: canAddTerm ? 1 : 0.5 }}>Add Term</PrimaryButton>
+            </div>
+          )}
           {showPreset && (
             <div style={{ background: 'var(--c-bg-alt)', border: '1.5px solid var(--c-border)', borderRadius: 10, padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
@@ -321,7 +323,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                 .map(t => {
                   const isCurrent = currentTerm && currentTerm.id === t.id;
                   return (
-                    <div key={t.id} className="gt-card" style={{ padding: 14, borderLeft: isCurrent ? '5px solid var(--c-gold)' : '5px solid transparent' }}>
+                    <div key={t.id} className="gt-card" style={{ padding: 14, borderLeft: isCurrent ? '5px solid var(--c-accent)' : '5px solid transparent' }}>
                       {editingId === t.id ? (
                         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
                           <TextField label="Term Name" value={editForm.name} onChange={v => setEditForm({ ...editForm, name: v })} />
@@ -338,7 +340,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                             <div className="gt-serif" style={{ fontSize: 16, color: 'var(--c-ink-soft)', display: 'flex', alignItems: 'center', gap: 8 }}>
                               {t.name}
                               {isCurrent && (
-                                <span className="gt-mono" style={{ fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'var(--c-gold-tint)', color: 'var(--c-gold-dark)', padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>Current</span>
+                                <span className="gt-mono" style={{ fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'var(--c-accent-tint)', color: 'var(--c-accent-dark)', padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>Current</span>
                               )}
                             </div>
                             <div className="gt-mono" style={{ fontSize: 12, color: 'var(--c-text-faint)', marginTop: 2 }}>{formatDate(t.startDate)} – {formatDate(t.endDate)}</div>
@@ -352,7 +354,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                           ) : (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                               {termDurationDays(t) !== null && (
-                                <span className="gt-mono" style={{ fontSize: 11, color: 'var(--c-text-muted)', background: 'rgba(0,0,0,0.04)', padding: '3px 9px', borderRadius: 20, fontWeight: 600 }}>
+                                <span className="gt-mono" style={{ fontSize: 11, color: 'var(--c-text-muted)', background: 'var(--c-overlay-4)', padding: '3px 9px', borderRadius: 20, fontWeight: 600 }}>
                                   {termDurationDays(t)} day{termDurationDays(t) === 1 ? '' : 's'}
                                 </span>
                               )}

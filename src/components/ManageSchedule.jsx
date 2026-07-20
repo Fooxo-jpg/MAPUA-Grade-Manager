@@ -54,7 +54,7 @@ function ScheduleGrid({ entries, courses }) {
                       position: 'absolute', top, height: h, left: 2, right: 2, borderRadius: 6,
                       background: entryColor, color: '#fff', padding: '3px 6px',
                       fontSize: 10.5, overflow: 'hidden', lineHeight: 1.25, cursor: 'pointer',
-                      boxShadow: isSelected ? '0 0 0 2px var(--c-forest-dark)' : 'none',
+                      boxShadow: isSelected ? '0 0 0 2px var(--c-ink)' : 'none',
                     }}
                   >
                     <div className="gt-mono" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -86,7 +86,7 @@ function ScheduleGrid({ entries, courses }) {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: selected.color || (selectedCourse ? selectedCourse.color : 'var(--c-text-placeholder)'), flexShrink: 0, marginTop: 5 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-forest-dark)', overflowWrap: 'break-word' }}>{selectedCourse ? selectedCourse.name : 'Unknown Course'}</div>
+              <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-ink)', overflowWrap: 'break-word' }}>{selectedCourse ? selectedCourse.name : 'Unknown Course'}</div>
               <div className="gt-mono" style={{ fontSize: 11.5, color: 'var(--c-text-faint)' }}>{selectedCourse ? selectedCourse.code : ''}</div>
             </div>
             <IconButton icon={X} onClick={() => setSelectedId(null)} title="Close" />
@@ -305,7 +305,7 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
         <Eyebrow>Manage Schedule</Eyebrow>
-        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>
+        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px' }}>
           {currentTerm ? currentTerm.name : 'No Active Term'}
         </h1>
       </div>

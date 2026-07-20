@@ -10,7 +10,7 @@ function Stamp({ currentTerm }) {
   return (
     <div
       className="gt-stamp"
-      style={{ color, display: 'inline-block', padding: '18px 30px', background: 'rgba(255,255,255,0.5)' }}
+      style={{ color, display: 'inline-block', padding: '18px 30px', background: 'color-mix(in srgb, var(--c-surface) 55%, transparent)' }}
     >
       <div className="gt-serif" style={{ fontSize: isBreak ? 30 : 22, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', textAlign: 'center' }}>
         {isBreak ? 'Break Mode' : currentTerm.name}
@@ -176,7 +176,7 @@ export default function Dashboard({ data }) {
               </div>
               <div>
                 <div className="gt-stat-label">Left</div>
-                <div className="gt-stat-value" style={{ color: 'var(--c-gold)' }}>{leftUnits}</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-accent)' }}>{leftUnits}</div>
               </div>
             </div>
             <div style={{ marginTop: 16 }}>
@@ -184,7 +184,7 @@ export default function Dashboard({ data }) {
                 <div
                   style={{
                     height: '100%', width: `${progressPct}%`, borderRadius: 999,
-                    background: 'linear-gradient(90deg, var(--c-forest), var(--c-gold))',
+                    background: 'linear-gradient(90deg, var(--c-forest), var(--c-accent))',
                     transition: 'width 400ms var(--ease)',
                   }}
                 />
@@ -228,7 +228,7 @@ export default function Dashboard({ data }) {
               </>
             ) : (
               <>
-                <div className="gt-stat-value" style={{ color: 'var(--c-gold)' }}>{neededGrade.toFixed(2)}</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-accent)' }}>{neededGrade.toFixed(2)}</div>
                 <div className="gt-stat-caption">average across {currentTermUnits} unit{currentTermUnits == 1 ? '' : 's'} to stay at {goalGWA.toFixed(2)}</div>
               </>
             )}
@@ -239,7 +239,7 @@ export default function Dashboard({ data }) {
               <div className="gt-stat-empty">No finished terms yet.</div>
             ) : (
               <>
-                <div className="gt-stat-value" style={{ color: 'var(--c-gold)' }}>{cumulative.gwa.toFixed(2)}</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-accent)' }}>{cumulative.gwa.toFixed(2)}</div>
                 <div className="gt-stat-caption">across {cumulative.unitsConsidered} unit{cumulative.unitsConsidered == 1 ? '' : 's'} considered</div>
               </>
             )}
@@ -258,18 +258,20 @@ export default function Dashboard({ data }) {
                 <LineChart data={chartData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }}>
                   <defs>
                     <linearGradient id="gwaLine" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#2D5240" />
-                      <stop offset="100%" stopColor="#B8860B" />
+                      <stop offset="0%" stopColor="var(--c-forest)" />
+                      <stop offset="100%" stopColor="var(--c-accent)" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="#EEE9DB" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#8A8A7E' }} axisLine={{ stroke: '#DDD6C4' }} tickLine={false} />
-                  <YAxis reversed={lowerIsBetter} tick={{ fontSize: 11, fill: '#8A8A7E' }} axisLine={false} tickLine={false} width={36} domain={['auto', 'auto']} />
+                  <CartesianGrid stroke="var(--c-divider)" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--c-text-faint)' }} axisLine={{ stroke: 'var(--c-border-strong)' }} tickLine={false} />
+                  <YAxis reversed={lowerIsBetter} tick={{ fontSize: 11, fill: 'var(--c-text-faint)' }} axisLine={false} tickLine={false} width={36} domain={['auto', 'auto']} />
                   <Tooltip
-                    contentStyle={{ background: '#FCFBF7', border: '1.5px solid #E3DCC9', borderRadius: 8, fontSize: 12.5, boxShadow: '0 6px 18px rgba(34,57,45,0.12)' }}
+                    contentStyle={{ background: 'var(--c-surface)', border: '1.5px solid var(--c-border)', borderRadius: 8, fontSize: 12.5, boxShadow: 'var(--shadow-md)', color: 'var(--c-ink-soft)' }}
+                    labelStyle={{ color: 'var(--c-ink-soft)' }}
+                    itemStyle={{ color: 'var(--c-ink-soft)' }}
                     labelFormatter={(_, payload) => (payload && payload[0] ? payload[0].payload.fullName : '')}
                   />
-                  <Line type="monotone" dataKey="gwa" stroke="url(#gwaLine)" strokeWidth={2.75} dot={{ r: 4, fill: '#B8860B', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="gwa" stroke="url(#gwaLine)" strokeWidth={2.75} dot={{ r: 4, fill: 'var(--c-accent)', strokeWidth: 0 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -277,7 +279,7 @@ export default function Dashboard({ data }) {
               {gwaHistory.map(row => (
                 <div key={row.term.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px', borderTop: '1px solid var(--c-divider)' }}>
                   <span style={{ fontSize: 13.5, color: 'var(--c-ink-soft)' }}>{row.term.name}</span>
-                  <span className="gt-mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-gold)' }}>{row.gwa.toFixed(2)}</span>
+                  <span className="gt-mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-accent)' }}>{row.gwa.toFixed(2)}</span>
                 </div>
               ))}
             </div>

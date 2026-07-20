@@ -4,9 +4,9 @@ import { COURSE_COLORS, COURSE_TYPES, uid, getCourseStatus } from '../utils';
 import { Eyebrow, EmptyState, TextField, CoursePicker, ColorSwatchPicker, PrimaryButton, IconButton } from './SharedUI';
 
 const STATUS_META = {
-  taken: { label: 'Taken', color: 'var(--c-forest)', bg: 'rgba(45,82,64,0.1)' },
-  current: { label: 'In Current Load', color: 'var(--c-link)', bg: 'rgba(59,91,169,0.1)' },
-  'not-yet': { label: 'Not Yet Taken', color: 'var(--c-text-faint)', bg: 'rgba(0,0,0,0.05)' },
+  taken: { label: 'Taken', color: 'var(--c-forest)', bg: 'color-mix(in srgb, var(--c-forest) 10%, transparent)' },
+  current: { label: 'In Current Load', color: 'var(--c-link)', bg: 'color-mix(in srgb, var(--c-link) 10%, transparent)' },
+  'not-yet': { label: 'Not Yet Taken', color: 'var(--c-text-faint)', bg: 'var(--c-overlay-5)' },
 };
 
 function CategoryEditor({ categories, onChange }) {
@@ -32,7 +32,7 @@ function CategoryEditor({ categories, onChange }) {
             <span
               key={cat.id}
               className="gt-mono"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: 'var(--c-text)', background: 'rgba(0,0,0,0.04)', padding: '3px 6px 3px 10px', borderRadius: 20 }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: 'var(--c-text)', background: 'var(--c-overlay-4)', padding: '3px 6px 3px 10px', borderRadius: 20 }}
             >
               {cat.name} · {cat.weight}%
               <button onClick={() => remove(cat.id)} title="Remove category" style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--c-danger)', display: 'inline-flex', padding: 2 }}>
@@ -104,7 +104,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
         <Eyebrow>Manage Courses</Eyebrow>
-        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px', color: 'var(--c-forest-dark)' }}>Course Catalog</h1>
+        <h1 className="gt-serif gt-page-title" style={{ fontSize: 30, margin: '4px 0 18px' }}>Course Catalog</h1>
 
         {!showAddForm ? (
           <PrimaryButton onClick={() => setShowAddForm(true)} icon={Plus}>Add New Course</PrimaryButton>
@@ -142,7 +142,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                 type="checkbox"
                 checked={form.unitsConsidered}
                 onChange={e => setForm({ ...form, unitsConsidered: e.target.checked })}
-                style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
+                style={{ width: 16, height: 16, accentColor: 'var(--c-accent)', cursor: 'pointer' }}
               />
               <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)' }}>
                 Units Considered (counts toward GWA)
@@ -156,7 +156,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                 type="checkbox"
                 checked={form.useCategoryWeights}
                 onChange={e => setForm({ ...form, useCategoryWeights: e.target.checked })}
-                style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
+                style={{ width: 16, height: 16, accentColor: 'var(--c-accent)', cursor: 'pointer' }}
               />
               <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                 <Tag size={12} /> Use category weights
@@ -214,7 +214,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={editForm.unitsConsidered}
                           onChange={e => setEditForm({ ...editForm, unitsConsidered: e.target.checked })}
-                          style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
+                          style={{ width: 16, height: 16, accentColor: 'var(--c-accent)', cursor: 'pointer' }}
                         />
                         <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)' }}>
                           Units Considered (counts toward GWA)
@@ -227,7 +227,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={editForm.useCategoryWeights}
                           onChange={e => setEditForm({ ...editForm, useCategoryWeights: e.target.checked })}
-                          style={{ width: 16, height: 16, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
+                          style={{ width: 16, height: 16, accentColor: 'var(--c-accent)', cursor: 'pointer' }}
                         />
                         <span className="gt-mono" style={{ fontSize: 11.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                           <Tag size={12} /> Use category weights
@@ -259,7 +259,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                               fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700,
                               padding: '2px 8px', borderRadius: 20,
                               color: (COURSE_TYPES.find(t => t.name === c.courseType) || COURSE_TYPES[0]).color,
-                              background: 'rgba(0,0,0,0.04)',
+                              background: 'var(--c-overlay-4)',
                             }}>{c.courseType}</span>
                           )}
                           {(() => {
@@ -290,7 +290,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={c.unitsConsidered !== false}
                           onChange={e => updateCourse(c.id, { unitsConsidered: e.target.checked })}
-                          style={{ width: 15, height: 15, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
+                          style={{ width: 15, height: 15, accentColor: 'var(--c-accent)', cursor: 'pointer' }}
                         />
                         <span className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text-muted)' }}>
                           Units Considered
@@ -301,7 +301,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                           type="checkbox"
                           checked={!!c.useCategoryWeights}
                           onChange={e => updateCourse(c.id, { useCategoryWeights: e.target.checked })}
-                          style={{ width: 15, height: 15, accentColor: 'var(--c-forest)', cursor: 'pointer' }}
+                          style={{ width: 15, height: 15, accentColor: 'var(--c-accent)', cursor: 'pointer' }}
                         />
                         <span className="gt-mono" style={{ fontSize: 10.5, letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, color: 'var(--c-text-muted)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                           <Tag size={11} /> Categories
@@ -325,7 +325,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                         {(c.categories || []).length > 0 ? (
                           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                             {c.categories.map(cat => (
-                              <span key={cat.id} className="gt-mono" style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text)', background: 'rgba(0,0,0,0.04)', padding: '3px 9px', borderRadius: 20 }}>
+                              <span key={cat.id} className="gt-mono" style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text)', background: 'var(--c-overlay-4)', padding: '3px 9px', borderRadius: 20 }}>
                                 {cat.name} · {cat.weight}%
                               </span>
                             ))}

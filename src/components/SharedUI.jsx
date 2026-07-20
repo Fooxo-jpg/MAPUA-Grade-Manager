@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Pipette, Check } from 'lucide-react';
-import { COURSE_COLORS, GRADE_SCALE, SPECIAL_GRADES } from '../utils';
+import { COURSE_COLORS, gradeScaleFor, SPECIAL_GRADES } from '../utils';
 
 export function Eyebrow({ children }) {
   return <div className="gt-eyebrow">{children}</div>;
@@ -66,7 +66,8 @@ export function ColorSwatchPicker({ value, onChange }) {
   );
 }
 
-export function GradeSelect({ value, onChange, disabled, title, width = 90 }) {
+export function GradeSelect({ value, onChange, disabled, title, width = 90, gradingSystem }) {
+  const scale = gradeScaleFor(gradingSystem);
   return (
     <select
       value={value || ''}
@@ -77,7 +78,7 @@ export function GradeSelect({ value, onChange, disabled, title, width = 90 }) {
       style={{ width }}
     >
       <option value="">—</option>
-      {GRADE_SCALE.map(g => <option key={g} value={g}>{g}</option>)}
+      {scale.map(g => <option key={g} value={g}>{g}</option>)}
       {SPECIAL_GRADES.map(g => <option key={g} value={g}>{g}</option>)}
     </select>
   );
@@ -126,7 +127,7 @@ export function CoursePicker({ label, options, selectedIds, onToggle }) {
                   onMouseEnter={e => { if (!checked) e.currentTarget.style.background = 'var(--c-bg-alt)'; }}
                   onMouseLeave={e => { if (!checked) e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <input type="checkbox" checked={checked} onChange={() => onToggle(c.id)} style={{ width: 15, height: 15, accentColor: 'var(--c-forest)' }} />
+                  <input type="checkbox" checked={checked} onChange={() => onToggle(c.id)} style={{ width: 15, height: 15, accentColor: 'var(--c-accent)' }} />
                   <span className="gt-mono" style={{ fontSize: 11.5, fontWeight: 700, color: c.color, minWidth: 54 }}>{c.code}</span>
                   <span style={{ fontSize: 13, color: 'var(--c-ink-soft)' }}>{c.name}</span>
                 </label>

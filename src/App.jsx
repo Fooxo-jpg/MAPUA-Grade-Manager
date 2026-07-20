@@ -172,6 +172,11 @@ export default function App() {
     '--c-sidebar-to': sidebarPreset.to,
     '--c-sidebar-accent': sidebarPreset.accent,
     '--c-sidebar-accent-bright': sidebarPreset.accentBright,
+    // Same preset also drives the app-wide accent used for highlights on
+    // every page (GWA figures, "current" badges, chart lines, etc.), so
+    // changing the color scheme updates more than just the side panel.
+    '--c-accent': sidebarPreset.accent,
+    '--c-accent-bright': sidebarPreset.accentBright,
   };
 
   if (!loaded) {

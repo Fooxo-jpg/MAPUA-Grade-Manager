@@ -45,7 +45,7 @@
   --shadow-sm: 0 2px 6px rgba(34, 57, 45, 0.07);
   --shadow-md: 0 6px 18px rgba(34, 57, 45, 0.10);
   --shadow-lg: 0 14px 36px rgba(34, 57, 45, 0.20);
-  --shadow-focus: 0 0 0 3px rgba(45, 82, 64, 0.18);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--c-accent) 18%, transparent);
   --shadow-focus-danger: 0 0 0 3px rgba(178, 58, 46, 0.16);
 
   /* shape */
@@ -64,6 +64,25 @@
   --c-sidebar-to: #1c3225;
   --c-sidebar-accent: var(--c-gold);
   --c-sidebar-accent-bright: var(--c-gold-bright);
+
+  /* app-wide accent — mirrors whichever color scheme is chosen in
+     Account Settings, so highlights across every page (not just the
+     side panel) stay in sync. Overridden inline alongside the sidebar
+     vars once a preset is picked; these are just the initial defaults. */
+  --c-accent: var(--c-gold);
+  --c-accent-bright: var(--c-gold-bright);
+  --c-accent-dark: color-mix(in srgb, var(--c-accent) 75%, black);
+  --c-accent-tint: color-mix(in srgb, var(--c-accent) 18%, white);
+
+  /* neutral ink-based overlays for subtle chip/row backgrounds. These
+     derive from --c-ink (which flips between near-black and near-white
+     across themes) so the wash goes the right direction automatically
+     instead of a fixed black tint going invisible on dark surfaces. */
+  --c-overlay-2: color-mix(in srgb, var(--c-ink) 2%, transparent);
+  --c-overlay-3: color-mix(in srgb, var(--c-ink) 3%, transparent);
+  --c-overlay-4: color-mix(in srgb, var(--c-ink) 4%, transparent);
+  --c-overlay-5: color-mix(in srgb, var(--c-ink) 5%, transparent);
+  --c-overlay-8: color-mix(in srgb, var(--c-ink) 8%, transparent);
 }
 
 /* ============================================================
@@ -109,8 +128,13 @@
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.55);
-  --shadow-focus: 0 0 0 3px rgba(62, 122, 85, 0.35);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--c-accent) 35%, transparent);
   --shadow-focus-danger: 0 0 0 3px rgba(224, 104, 90, 0.3);
+
+  /* accent derivatives lean lighter/darker the opposite way in dark mode
+     so text/tint pairs built from the accent stay legible */
+  --c-accent-dark: color-mix(in srgb, var(--c-accent) 65%, white);
+  --c-accent-tint: color-mix(in srgb, var(--c-accent) 20%, black);
 }
 
 /* ============================================================
@@ -152,7 +176,7 @@ input, select, textarea {
   transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
 }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--c-forest) !important;
+  border-color: var(--c-accent) !important;
   box-shadow: var(--shadow-focus);
 }
 input::placeholder, textarea::placeholder { color: var(--c-text-placeholder); }
@@ -232,8 +256,8 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
 }
 .gt-btn:active:not(:disabled) { transform: translateY(1px); }
 
-.gt-btn-primary { padding: 10px 16px; background: var(--c-forest); color: var(--c-on-forest); box-shadow: var(--shadow-xs); }
-.gt-btn-primary:hover:not(:disabled) { background: var(--c-forest-hover); box-shadow: var(--shadow-sm); }
+.gt-btn-primary { padding: 10px 16px; background: var(--c-accent); color: var(--c-on-forest); box-shadow: var(--shadow-xs); }
+.gt-btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--c-accent) 85%, black); box-shadow: var(--shadow-sm); }
 .gt-btn-primary:disabled { background: var(--c-text-placeholder); cursor: not-allowed; box-shadow: none; }
 
 .gt-btn-secondary {
@@ -244,10 +268,10 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
 .gt-btn-secondary:disabled { color: var(--c-text-placeholder); cursor: not-allowed; }
 
 .gt-btn-danger { padding: 10px 16px; background: var(--c-danger); color: var(--c-on-forest); box-shadow: var(--shadow-xs); }
-.gt-btn-danger:hover:not(:disabled) { background: #9c3126; box-shadow: var(--shadow-sm); }
+.gt-btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--c-danger) 80%, black); box-shadow: var(--shadow-sm); }
 .gt-btn-danger:disabled { background: var(--c-danger-tint); cursor: not-allowed; box-shadow: none; }
 
-.gt-btn-outline { padding: 9px 15px; background: var(--c-surface); color: var(--c-forest); border: 1.5px solid var(--c-border-strong); }
+.gt-btn-outline { padding: 9px 15px; background: var(--c-surface); color: var(--c-accent-dark); border: 1.5px solid var(--c-border-strong); }
 .gt-btn-outline:hover:not(:disabled) { background: var(--c-bg-alt); border-color: var(--c-text-placeholder); }
 .gt-btn-outline--active { background: var(--c-surface-selected); }
 
@@ -313,8 +337,8 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
 .gt-mode-toggle-btn:hover { color: var(--c-ink-soft); }
-.gt-mode-toggle-btn--active { background: var(--c-surface); color: var(--c-forest); box-shadow: var(--shadow-xs); }
-.gt-mode-toggle-btn--active:hover { color: var(--c-forest); }
+.gt-mode-toggle-btn--active { background: var(--c-surface); color: var(--c-accent-dark); box-shadow: var(--shadow-xs); }
+.gt-mode-toggle-btn--active:hover { color: var(--c-accent-dark); }
 
 .gt-swatch-btn {
   width: 46px; height: 34px; border-radius: 8px; cursor: pointer; padding: 0; overflow: hidden;

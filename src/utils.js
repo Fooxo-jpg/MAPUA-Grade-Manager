@@ -24,6 +24,20 @@ export const SIDEBAR_THEMES = [
 // Fixed MAPUA-style grade scale — permanent, never added to or removed from.
 export const GRADE_LEVELS = [1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 5.00];
 
+// For accounts using the "5.00 is highest" convention, each grade level mirrors
+// around the 3.00 passing threshold (1.00->5.00, 1.25->4.75, ... 3.00->3.00),
+// and the failing mark mirrors too (5.00->1.00). This keeps the same
+// best-to-worst order and the same "gap" shape as the 1.00-highest scale,
+// just flipped to the other end, instead of jumping straight from 5.00 to 3.00.
+export function mirrorGrade(g) {
+  return Number((6 - g).toFixed(2));
+}
+
+// Returns the fixed grade scale in best-to-worst order for the given grading system.
+export function gradeLevelsFor(gradingSystem) {
+  return gradingSystem === 'highest-5' ? GRADE_LEVELS.map(mirrorGrade) : GRADE_LEVELS.slice();
+}
+
 function defaultGradeTable() {
   return GRADE_LEVELS.map((g, i) => ({ id: 'rank-' + i, low: '', high: '', grade: g.toFixed(2) }));
 }
@@ -186,6 +200,11 @@ export const SPECIAL_GRADES = ['P', 'INC'];
 // The only grade points that can be entered as a final grade — matches the standard
 // 1.00 (highest) – 5.00 (fail) scale. P/INC are handled separately as special grades.
 export const GRADE_SCALE = ['1.00', '1.25', '1.50', '1.75', '2.00', '2.25', '2.50', '2.75', '3.00', '5.00'];
+
+// Same options, but mirrored to 5.00-highest order when the account uses that convention.
+export function gradeScaleFor(gradingSystem) {
+  return gradeLevelsFor(gradingSystem).map(g => g.toFixed(2));
+}
 
 export function isSpecialGrade(raw) {
   if (raw === undefined || raw === null) return false;
