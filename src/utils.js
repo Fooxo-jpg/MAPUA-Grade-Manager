@@ -13,12 +13,12 @@ export const COURSE_COLORS = [
 // Preset color schemes for the sidebar (side panel). Each defines the
 // top-to-bottom gradient and the accent used for the active nav item / logo.
 export const SIDEBAR_THEMES = [
-  { id: 'forest',   name: 'Forest & Gold',     from: '#22392D', to: '#1c3225', accent: '#B8860B', accentBright: '#F0C929' },
-  { id: 'navy',     name: 'Navy & Silver',     from: '#16213A', to: '#0F1830', accent: '#6E8FC2', accentBright: '#A9C2E8' },
-  { id: 'plum',     name: 'Plum & Rose',       from: '#2E1F3A', to: '#20142B', accent: '#B472A0', accentBright: '#E3A6C7' },
-  { id: 'slate',    name: 'Slate & Teal',      from: '#1E2A2C', to: '#141D1E', accent: '#4FA3AC', accentBright: '#8FD1D9' },
-  { id: 'burgundy', name: 'Burgundy & Copper', from: '#3A1A1E', to: '#270F12', accent: '#C17A3E', accentBright: '#E0A15C' },
-  { id: 'charcoal', name: 'Charcoal & Mint',   from: '#20221F', to: '#141613', accent: '#4FA575', accentBright: '#7FCB9E' },
+  { id: 'forest',   name: 'Forest',   from: '#22392D', to: '#1c3225', accent: '#4EBC86', accentBright: '#85D6AF' },
+  { id: 'navy',     name: 'Navy',     from: '#16213A', to: '#0F1830', accent: '#4E6FBC', accentBright: '#859ED6' },
+  { id: 'plum',     name: 'Plum',     from: '#2E1F3A', to: '#20142B', accent: '#8B4EBC', accentBright: '#B285D6' },
+  { id: 'slate',    name: 'Slate',    from: '#1E2A2C', to: '#141D1E', accent: '#4EACBC', accentBright: '#85CBD6' },
+  { id: 'burgundy', name: 'Burgundy', from: '#3A1A1E', to: '#270F12', accent: '#BC4E5B', accentBright: '#D6858F' },
+  { id: 'charcoal', name: 'Charcoal', from: '#20221F', to: '#141613', accent: '#72BC4E', accentBright: '#A0D685' },
 ];
 
 // Fixed MAPUA-style grade scale — permanent, never added to or removed from.

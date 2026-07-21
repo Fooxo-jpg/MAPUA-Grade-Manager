@@ -172,7 +172,7 @@ export default function Dashboard({ data }) {
               </div>
               <div>
                 <div className="gt-stat-label">Passed</div>
-                <div className="gt-stat-value" style={{ color: 'var(--c-forest)' }}>{passedUnits}</div>
+                <div className="gt-stat-value" style={{ color: 'var(--c-accent)' }}>{passedUnits}</div>
               </div>
               <div>
                 <div className="gt-stat-label">Left</div>

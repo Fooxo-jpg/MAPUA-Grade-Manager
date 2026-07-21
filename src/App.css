@@ -4,6 +4,8 @@
    DESIGN TOKENS
    ============================================================ */
 :root {
+  color-scheme: light;
+
   /* base surfaces */
   --c-bg: #F5F3EA;
   --c-bg-alt: #F4F1E6;
@@ -31,10 +33,10 @@
   --c-forest-dark: #22392D;
   --c-forest-hover: #244535;
   --c-on-forest: #F5F7F3;
-  --c-gold: #B8860B;
-  --c-gold-dark: #8A6A0D;
-  --c-gold-bright: #F0C929;
-  --c-gold-tint: #F5E7BE;
+  --c-gold: #4EBC86;
+  --c-gold-dark: #2E9C68;
+  --c-gold-bright: #85D6AF;
+  --c-gold-tint: #DFF3E9;
   --c-link: #3B5BA9;
   --c-danger: #B23A2E;
   --c-danger-tint: #E3B8B0;
@@ -60,16 +62,16 @@
   --t-med: 200ms;
 
   /* sidebar (side panel) customization — overridden inline per the chosen preset */
-  --c-sidebar-from: var(--c-forest-dark);
+  --c-sidebar-from: var(--c-white);
   --c-sidebar-to: #1c3225;
-  --c-sidebar-accent: var(--c-gold);
-  --c-sidebar-accent-bright: var(--c-gold-bright);
+  --c-sidebar-accent: var(--c-white);
+  --c-sidebar-accent-bright: var(--c-text);
 
   /* app-wide accent — mirrors whichever color scheme is chosen in
      Account Settings, so highlights across every page (not just the
      side panel) stay in sync. Overridden inline alongside the sidebar
      vars once a preset is picked; these are just the initial defaults. */
-  --c-accent: var(--c-gold);
+  --c-accent: var(--c-white);
   --c-accent-bright: var(--c-gold-bright);
   --c-accent-dark: color-mix(in srgb, var(--c-accent) 75%, black);
   --c-accent-tint: color-mix(in srgb, var(--c-accent) 18%, white);
@@ -88,10 +90,12 @@
 /* ============================================================
    DARK THEME
    Same warm, ledger-inspired identity — deep charcoal-green
-   surfaces with parchment ink and the same gold accent — just
-   inverted for low-light reading.
+   surfaces with parchment ink and the same theme-synced accent —
+   just inverted for low-light reading.
    ============================================================ */
 :root[data-theme='dark'] {
+  color-scheme: dark;
+
   --c-bg: #161B16;
   --c-bg-alt: #1B211B;
   --c-surface: #1F251F;
@@ -115,10 +119,10 @@
   --c-forest-dark: #10150F;
   --c-forest-hover: #468761;
   --c-on-forest: #F5F7F3;
-  --c-gold: #D8A73E;
-  --c-gold-dark: #B8860B;
-  --c-gold-bright: #F0C929;
-  --c-gold-tint: rgba(240, 201, 41, 0.16);
+  --c-gold: #4EBC86;
+  --c-gold-dark: #3AA06E;
+  --c-gold-bright: #85D6AF;
+  --c-gold-tint: rgba(78, 188, 134, 0.16);
   --c-link: #86A8E8;
   --c-danger: #E0685A;
   --c-danger-tint: #6B3630;
@@ -151,7 +155,7 @@ html, body { height: 100%; margin: 0; overflow: hidden; background: var(--c-bg);
 *::-webkit-scrollbar-thumb { background: var(--c-border-strong); border-radius: 8px; }
 *::-webkit-scrollbar-thumb:hover { background: var(--c-text-placeholder); }
 
-::selection { background: var(--c-gold-tint); color: var(--c-ink); }
+::selection { background: var(--c-accent-tint); color: var(--c-ink); }
 
 a { color: var(--c-link); }
 
@@ -311,6 +315,8 @@ input:not(:disabled):hover, select:not(:disabled):hover, textarea:not(:disabled)
 }
 .gt-grade-select:hover:not(:disabled) { border-color: var(--c-text-placeholder); }
 .gt-grade-select:disabled { background: var(--c-surface-disabled); cursor: not-allowed; }
+
+.gt-input option, .gt-select option, .gt-grade-select option { background: var(--c-surface); color: var(--c-ink-soft); }
 
 /* ============================================================
    EMPTY STATES

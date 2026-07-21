@@ -133,7 +133,7 @@ export default function DataManager({ data, importData }) {
                 fontSize: 12.5, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', cursor: 'pointer',
               }}
             >
-              <FileText size={14} /> Choose File
+              <FileText size={14}/> Choose File
             </button>
           </div>
 

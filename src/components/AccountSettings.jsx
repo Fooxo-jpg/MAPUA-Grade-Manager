@@ -193,7 +193,7 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 240 }}>
             <span className="gt-field-label">Sidebar Color</span>
-            <SidebarThemePicker value={data.account.sidebarTheme || 'forest'} onChange={v => updateAccount({ sidebarTheme: v })} />
+            <SidebarThemePicker value={data.account.sidebarTheme} onChange={v => updateAccount({ sidebarTheme: v })} />
           </div>
         </div>
       </SettingsSection>
