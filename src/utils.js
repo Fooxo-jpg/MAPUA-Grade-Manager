@@ -120,11 +120,19 @@ export function termDurationDays(term) {
   return diff > 0 ? diff : null;
 }
 
+// Course-type colors are shades of the current accent (the sidebar color chosen
+// in Account Settings) rather than fixed hex values, so they automatically
+// follow whichever accent the user picks instead of needing a manual color choice.
 export const COURSE_TYPES = [
-  { name: 'Core', color: '#2D5240' },
-  { name: 'Specialization', color: '#3B5BA9' },
-  { name: 'Elective', color: '#C97B3D' },
+  { name: 'Core', color: 'var(--c-accent)' },
+  { name: 'Specialization', color: 'color-mix(in srgb, var(--c-accent) 65%, black)' },
+  { name: 'Elective', color: 'color-mix(in srgb, var(--c-accent) 55%, white)' },
 ];
+
+// Resolves a course type name to its accent-derived shade.
+export function courseTypeColor(typeName) {
+  return (COURSE_TYPES.find(t => t.name === typeName) || COURSE_TYPES[0]).color;
+}
 
 export const COURSE_TYPE_ORDER = ['Core', 'Elective', 'Specialization'];
 

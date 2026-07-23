@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, Plus, Check, X, Pencil, Trash2, Tag } from 'lucide-react';
-import { COURSE_COLORS, COURSE_TYPES, uid, getCourseStatus } from '../utils';
-import { Eyebrow, EmptyState, TextField, CoursePicker, ColorSwatchPicker, PrimaryButton, IconButton } from './SharedUI';
+import { COURSE_TYPES, courseTypeColor, uid, getCourseStatus } from '../utils';
+import { Eyebrow, EmptyState, TextField, CoursePicker, PrimaryButton, IconButton } from './SharedUI';
 
 const STATUS_META = {
   taken: { label: 'Taken', color: 'var(--c-forest)', bg: 'color-mix(in srgb, var(--c-forest) 10%, transparent)' },
@@ -59,7 +59,7 @@ function CategoryEditor({ categories, onChange }) {
 
 export default function ManageCourses({ data, addCourse, updateCourse, deleteCourse }) {
   const blank = {
-    code: '', name: '', units: '', instructor: '', color: COURSE_COLORS[0].hex, courseType: COURSE_TYPES[0].name,
+    code: '', name: '', units: '', instructor: '', color: courseTypeColor(COURSE_TYPES[0].name), courseType: COURSE_TYPES[0].name,
     prerequisites: [], corequisites: [], useCategoryWeights: false, categories: [], unitsConsidered: true,
   };
   const [form, setForm] = useState(blank);
@@ -79,7 +79,8 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
 
   function startEdit(c) {
     setEditingId(c.id);
-    setEditForm({ prerequisites: [], corequisites: [], courseType: COURSE_TYPES[0].name, useCategoryWeights: false, categories: [], unitsConsidered: true, ...c });
+    const courseType = c.courseType || COURSE_TYPES[0].name;
+    setEditForm({ prerequisites: [], corequisites: [], useCategoryWeights: false, categories: [], unitsConsidered: true, ...c, courseType, color: courseTypeColor(courseType) });
   }
 
   function saveEdit() {
@@ -123,7 +124,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
               <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Course Type</span>
               <select
                 value={form.courseType}
-                onChange={e => setForm({ ...form, courseType: e.target.value })}
+                onChange={e => setForm({ ...form, courseType: e.target.value, color: courseTypeColor(e.target.value) })}
                 style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
               >
                 {COURSE_TYPES.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
@@ -167,11 +168,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
             )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <div className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, marginBottom: 6 }}>Color</div>
-              <ColorSwatchPicker value={form.color} onChange={v => setForm({ ...form, color: v })} />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 16, flexWrap: 'wrap', gap: 12 }}>
             <PrimaryButton onClick={submit} icon={Plus} style={{ opacity: canSubmit ? 1 : 0.5 }}>Add Course</PrimaryButton>
           </div>
         </div>
@@ -197,7 +194,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                         <span className="gt-mono" style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600 }}>Course Type</span>
                         <select
                           value={editForm.courseType}
-                          onChange={e => setEditForm({ ...editForm, courseType: e.target.value })}
+                          onChange={e => setEditForm({ ...editForm, courseType: e.target.value, color: courseTypeColor(e.target.value) })}
                           style={{ padding: '9px 11px', borderRadius: 8, border: '1.5px solid var(--c-border-strong)', fontSize: 14, background: 'var(--c-surface)', color: 'var(--c-ink-soft)' }}
                         >
                           {COURSE_TYPES.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
@@ -237,8 +234,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
                         <CategoryEditor categories={editForm.categories || []} onChange={cats => setEditForm({ ...editForm, categories: cats })} />
                       )}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-                      <ColorSwatchPicker value={editForm.color} onChange={v => setEditForm({ ...editForm, color: v })} />
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                       <div style={{ display: 'flex', gap: 8 }}>
                         <IconButton icon={Check} onClick={saveEdit} title="Save" />
                         <IconButton icon={X} onClick={() => setEditingId(null)} title="Cancel" />

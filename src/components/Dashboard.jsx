@@ -4,24 +4,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { getCurrentTerm, timeToMinutes, computeGWA, computeTermStats, computeCumulativeStats, formatDate, formatTime, DAYS, isTermEnded, getEffectiveGrade, isPassingGrade } from '../utils';
 import { Eyebrow, EmptyState } from './SharedUI';
 
-function Stamp({ currentTerm }) {
-  const isBreak = !currentTerm;
-  const color = isBreak ? 'var(--c-danger)' : 'var(--c-forest)';
-  return (
-    <div
-      className="gt-stamp"
-      style={{ color, display: 'inline-block', padding: '18px 30px', background: 'color-mix(in srgb, var(--c-surface) 55%, transparent)' }}
-    >
-      <div className="gt-serif" style={{ fontSize: isBreak ? 30 : 22, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', textAlign: 'center' }}>
-        {isBreak ? 'Break Mode' : currentTerm.name}
-      </div>
-      <div className="gt-mono" style={{ fontSize: 11.5, textAlign: 'center', marginTop: 6, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-        {isBreak ? 'No active term for today' : `${formatDate(currentTerm.startDate)} — ${formatDate(currentTerm.endDate)}`}
-      </div>
-    </div>
-  );
-}
-
 function StatCard({ label, labelIcon: LabelIcon, sub, children }) {
   return (
     <div className="gt-card gt-card--hover gt-stat-card">
@@ -101,7 +83,6 @@ export default function Dashboard({ data }) {
       <div>
         <Eyebrow>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</Eyebrow>
         <h1 className="gt-serif gt-page-title">Dashboard</h1>
-        <Stamp currentTerm={currentTerm} />
       </div>
 
       <div>
