@@ -328,6 +328,9 @@ export const defaultData = {
     goalGWA: '',
     theme: 'light',
     sidebarTheme: 'forest',
+    // Cloud auto-save interval in minutes. 0 means "off" (manual sync only).
+    // Local (on-device) saving always happens instantly regardless of this.
+    autoSaveMinutes: 5,
   },
   terms: [],
   courses: [],

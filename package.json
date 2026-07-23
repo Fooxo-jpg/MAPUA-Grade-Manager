@@ -17,6 +17,7 @@
     "electron:publish": "vite build && electron-builder --publish always"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.8",
     "electron-updater": "^6.3.9",
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",
@@ -49,9 +50,21 @@
     "directories": {
       "output": "release"
     },
-    "mac": { "target": ["dmg", "zip"], "icon": "build/icon.icns" },
-    "win": { "target": "nsis", "icon": "build/icon.ico" },
-    "linux": { "target": "AppImage", "icon": "build/icon.png" },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.png"
+    },
     "publish": [
       {
         "provider": "github",

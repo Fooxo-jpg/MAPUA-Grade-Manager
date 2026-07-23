@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { STORAGE_KEY, defaultData, findCourseTermId, uid, SIDEBAR_THEMES } from './utils';
+import { supabase, GRADEBOOK_TABLE } from './supabaseClient';
 
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -19,6 +20,17 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const saveTimer = useRef(null);
 
+  // ---- Auth / cloud sync state ----
+  const [session, setSession] = useState(undefined); // undefined = checking, null = signed out
+  const [cloudStatus, setCloudStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+  const [cloudError, setCloudError] = useState('');
+  const [lastSyncedAt, setLastSyncedAt] = useState(null);
+  const dirtyRef = useRef(false);
+  const dataRef = useRef(data);
+  dataRef.current = data;
+
+  // Load the locally-cached copy immediately so the UI is instant & works
+  // offline, then reconcile with Supabase once we know who's signed in.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -33,15 +45,115 @@ export default function App() {
     }
   }, []);
 
+  // Track the Supabase auth session.
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data: { session: s } }) => setSession(s));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  // Pushes the given (or current) data up to Supabase. Safe to call manually
+  // (the "Sync Now" button) or from the auto-save interval.
+  const syncNow = useCallback(async (explicitData) => {
+    if (!supabase || !session) return;
+    const payload = explicitData || dataRef.current;
+    setCloudStatus('syncing');
+    try {
+      const { error } = await supabase
+        .from(GRADEBOOK_TABLE)
+        .upsert({ user_id: session.user.id, data: payload, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+      if (error) throw error;
+      dirtyRef.current = false;
+      setLastSyncedAt(new Date());
+      setCloudStatus('synced');
+      setCloudError('');
+    } catch (err) {
+      setCloudStatus('error');
+      setCloudError(err.message || 'Sync failed.');
+    }
+  }, [session]);
+
+  // On sign-in, pull the cloud copy (if any) and reconcile with local storage
+  // by keeping whichever was updated most recently.
+  useEffect(() => {
+    if (!supabase || !session) return;
+    let cancelled = false;
+    (async () => {
+      setCloudStatus('syncing');
+      try {
+        const { data: row, error } = await supabase
+          .from(GRADEBOOK_TABLE)
+          .select('data, updated_at')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (error) throw error;
+        if (cancelled) return;
+
+        const localRaw = localStorage.getItem(STORAGE_KEY);
+        const localParsed = localRaw ? JSON.parse(localRaw) : null;
+        const localUpdatedAt = localParsed && localParsed.__updatedAt ? new Date(localParsed.__updatedAt) : null;
+        const cloudUpdatedAt = row ? new Date(row.updated_at) : null;
+
+        const cloudIsNewer = cloudUpdatedAt && (!localUpdatedAt || cloudUpdatedAt > localUpdatedAt);
+        if (row && cloudIsNewer) {
+          const merged = { ...defaultData, ...row.data, account: { ...defaultData.account, ...(row.data.account || {}) } };
+          setData(merged);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...merged, __updatedAt: row.updated_at }));
+          setLastSyncedAt(new Date(row.updated_at));
+        } else {
+          // Local copy is newer (or nothing exists in the cloud yet) — push it up.
+          await syncNow(dataRef.current);
+        }
+        setCloudStatus('synced');
+        setCloudError('');
+      } catch (err) {
+        if (!cancelled) {
+          setCloudStatus('error');
+          setCloudError(err.message || 'Could not reach Supabase.');
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, syncNow]);
+
+  // Auto-save to the cloud on the interval the user picked in Data Manager.
+  // "No auto-save" (0) means the user has to hit "Sync Now" themselves.
+  useEffect(() => {
+    const minutes = Number(data.account.autoSaveMinutes || 0);
+    if (!supabase || !session || !minutes) return;
+    const id = setInterval(() => {
+      if (dirtyRef.current) syncNow();
+    }, minutes * 60 * 1000);
+    return () => clearInterval(id);
+  }, [data.account.autoSaveMinutes, session, syncNow]);
+
+  // Best-effort: try to flush any unsynced changes right before the window closes.
+  useEffect(() => {
+    const handler = () => { if (dirtyRef.current) syncNow(); };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [syncNow]);
+
+  const signOut = useCallback(async () => {
+    if (dirtyRef.current) await syncNow();
+    if (supabase) await supabase.auth.signOut();
+  }, [syncNow]);
+
+  // Local save stays instant & debounced (this is the "every change" save —
+  // it keeps working offline and is what makes the UI feel snappy). Cloud
+  // sync is separate and follows the auto-save interval above.
   const persist = useCallback((next) => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...next, __updatedAt: new Date().toISOString() }));
       } catch (e) {
         console.error('Failed to save', e);
       }
     }, 350);
+    dirtyRef.current = true;
   }, []);
 
   const update = useCallback((fn) => {
@@ -204,8 +316,23 @@ export default function App() {
         {active === 'courses' && <ManageCourses data={data} addCourse={addCourse} updateCourse={updateCourse} deleteCourse={deleteCourse} />}
         {active === 'term' && <ManageTerm data={data} toggleCourseInTerm={toggleCourseInTerm} updateGrade={updateGrade} />}
         {active === 'schedule' && <ManageSchedule data={data} addScheduleEntries={addScheduleEntries} deleteSchedule={deleteSchedule} deleteScheduleGroup={deleteScheduleGroup} updateScheduleGroup={updateScheduleGroup} />}
-        {active === 'data' && <DataManager data={data} importData={importData} />}
-        {active === 'account' && <AccountSettings data={data} updateAccount={updateAccount} addTerm={addTerm} updateTerm={updateTerm} deleteTerm={deleteTerm} clearAllTerms={clearAllTerms} resetAllData={resetAllData} />}
+        {active === 'data' && (
+          <DataManager
+            data={data}
+            importData={importData}
+            updateAccount={updateAccount}
+            resetAllData={resetAllData}
+            session={session}
+            onSignedIn={setSession}
+            userEmail={session ? session.user.email : null}
+            cloudStatus={cloudStatus}
+            cloudError={cloudError}
+            lastSyncedAt={lastSyncedAt}
+            syncNow={() => syncNow()}
+            signOut={signOut}
+          />
+        )}
+        {active === 'account' && <AccountSettings data={data} updateAccount={updateAccount} addTerm={addTerm} updateTerm={updateTerm} deleteTerm={deleteTerm} clearAllTerms={clearAllTerms} />}
       </div>
     </div>
   );

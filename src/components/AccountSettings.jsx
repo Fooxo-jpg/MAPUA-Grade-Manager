@@ -68,7 +68,7 @@ function SidebarThemePicker({ value, onChange }) {
   );
 }
 
-export default function AccountSettings({ data, updateAccount, addTerm, updateTerm, deleteTerm, clearAllTerms, resetAllData }) {
+export default function AccountSettings({ data, updateAccount, addTerm, updateTerm, deleteTerm, clearAllTerms }) {
   const currentTerm = getCurrentTerm(data.terms);
   const blankTerm = { name: '', startDate: '', endDate: '' };
   const [termForm, setTermForm] = useState(blankTerm);
@@ -80,7 +80,6 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
   const [showPreset, setShowPreset] = useState(false);
   const [preset, setPreset] = useState({ startDate: '', years: 4, termsPerYear: 2 });
   const [confirmClearTerms, setConfirmClearTerms] = useState(false);
-  const [confirmResetAll, setConfirmResetAll] = useState(false);
 
   const canAddTerm = termForm.name.trim() && termForm.startDate && termForm.endDate;
   const canGeneratePreset = !!preset.startDate;
@@ -370,22 +369,6 @@ export default function AccountSettings({ data, updateAccount, addTerm, updateTe
                   );
                 })}
             </div>
-          )}
-        </div>
-      </SettingsSection>
-
-      <SettingsSection eyebrow="Danger Zone" title="Clear All Data" description="Permanently erases your profile, terms, courses, schedule, grades, and assessments. This cannot be undone.">
-        <div className="gt-card" style={{ padding: 20, border: '1.5px solid var(--c-danger-tint)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16, flexWrap: 'wrap' }}>
-          {confirmResetAll ? (
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <span style={{ fontSize: 12.5, color: 'var(--c-danger)', fontWeight: 600 }}>Are you sure?</span>
-              <IconButton icon={Check} onClick={() => { resetAllData(); setConfirmResetAll(false); }} title="Confirm" danger />
-              <IconButton icon={X} onClick={() => setConfirmResetAll(false)} title="Cancel" />
-            </div>
-          ) : (
-            <button onClick={() => setConfirmResetAll(true)} className="gt-mono gt-btn gt-btn-danger">
-              <Trash2 size={14} /> Clear All Data
-            </button>
           )}
         </div>
       </SettingsSection>
