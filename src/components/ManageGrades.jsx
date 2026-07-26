@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, ClipboardList, Trash2, Check, Plus, CalendarRange, BookOpen, ChevronUp, Clock3, Crown, X, AlertCircle } from 'lucide-react';
-import { percentToGradePoint, computeAssessmentStats, computeTermStats, getEffectiveGrade, getCurrentTerm, isTermEnded, hasTermStarted, uid, formatDate, gradeLevelsFor, isGradeGoalMet, MIN_GOAL_PERCENT } from '../utils';
+import { Lock, ClipboardList, Trash2, Check, Plus, CalendarRange, BookOpen, ChevronUp, Clock3, Crown, X, AlertCircle, Info } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { percentToGradePoint, computeAssessmentStats, computeTermStats, getEffectiveGrade, getCurrentTerm, isTermEnded, hasTermStarted, uid, formatDate, gradeLevelsFor, isGradeGoalMet, MIN_GOAL_PERCENT, COURSE_COLORS } from '../utils';
 import { Eyebrow, EmptyState, TextField, PrimaryButton, IconButton, GradeSelect } from './SharedUI';
 import { registerNewItemHandler, unregisterNewItemHandler } from '../shortcutRegistry';
 
@@ -218,6 +219,92 @@ function FinalGradeField({ termId, course, percent, account, grades, updateGrade
   );
 }
 
+// Hover-only info icon that reveals a pie-chart breakdown of how much each
+// grading category (Quizzes, Exams, Projects, ...) contributes to the
+// course's final grade. Purely a peek — no click/tap interaction needed.
+function CategoryWeightInfo({ categories }) {
+  const [open, setOpen] = useState(false);
+
+  const breakdown = (categories || [])
+    .map((cat, i) => ({
+      id: cat.id,
+      name: cat.name,
+      weight: parseFloat(cat.weight) || 0,
+      color: COURSE_COLORS[i % COURSE_COLORS.length].hex,
+    }))
+    .filter(c => c.weight > 0);
+
+  if (breakdown.length === 0) return null;
+
+  return (
+    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+      <div
+        style={{ position: 'relative', display: 'inline-flex' }}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        <span
+          title="How each category weighs into the final grade"
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 22, height: 22, borderRadius: '50%', cursor: 'help',
+            color: 'var(--c-text-muted)', background: 'var(--c-overlay-2)',
+          }}
+        >
+          <Info size={14} />
+        </span>
+
+        {open && (
+          <div
+            className="gt-card"
+            style={{
+              position: 'absolute', top: '100%', right: 0, marginTop: 6, width: 230,
+              padding: '14px 14px 12px', zIndex: 30, boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            <div
+              className="gt-mono"
+              style={{ fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, marginBottom: 6 }}
+            >
+              Grade Weight by Category
+            </div>
+            <div style={{ width: '100%', height: 130 }}>
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={breakdown}
+                    dataKey="weight"
+                    nameKey="name"
+                    innerRadius={30}
+                    outerRadius={55}
+                    paddingAngle={2}
+                    stroke="none"
+                  >
+                    {breakdown.map(c => <Cell key={c.id} fill={c.color} />)}
+                  </Pie>
+                  <RechartsTooltip
+                    formatter={(value, name) => [`${value}%`, name]}
+                    contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid var(--c-border-strong)' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
+              {breakdown.map(c => (
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
+                  <span style={{ color: 'var(--c-ink-soft)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                  <span className="gt-mono" style={{ color: 'var(--c-text-faint)', fontWeight: 700 }}>{c.weight}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AssessmentPanel({ termId, course, list, account, grades, updateGrade, addAssessment, updateAssessment, deleteAssessment, updateCourse, locked }) {
   const useCat = !!course.useCategoryWeights;
   const categories = course.categories || [];
@@ -266,7 +353,9 @@ function AssessmentPanel({ termId, course, list, account, grades, updateGrade, a
       </div>
 
       {list.length > 0 && (
-        <div className="gt-card" style={{ marginBottom: 14, overflowX: 'auto', overflowY: 'hidden', opacity: locked ? 0.75 : 1 }}>
+        <>
+          {useCat && <CategoryWeightInfo categories={categories} />}
+          <div className="gt-card" style={{ marginBottom: 14, overflowX: 'auto', overflowY: 'hidden', opacity: locked ? 0.75 : 1 }}>
           <div className="gt-mono" style={{ display: 'grid', gridTemplateColumns: cols, gap: 8, padding: '8px 12px', fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--c-text-muted)', fontWeight: 600, background: 'var(--c-overlay-2)', minWidth: 420 }}>
             <span>Assessment</span>
             <span>Score</span>
@@ -322,7 +411,8 @@ function AssessmentPanel({ termId, course, list, account, grades, updateGrade, a
               </div>
             );
           })}
-        </div>
+          </div>
+        </>
       )}
 
       {!locked && (
