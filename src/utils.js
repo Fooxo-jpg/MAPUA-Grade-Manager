@@ -78,6 +78,22 @@ export function isPassingGrade(value, account) {
   return highestIsOne ? (num >= 1 && num <= 3) : (num >= 3 && num <= 5);
 }
 
+// Honors thresholds, defined on the standard 1.00-highest scale.
+export const PRESIDENTS_LISTER_RANGE = { min: 1.00, max: 1.50 }; // 1.00 – <1.50
+export const DEANS_LISTER_RANGE = { min: 1.50, max: 1.75 };      // 1.50 – 1.75
+
+// Classifies a term's GWA into an honors tier. `gwa` is expected in whatever scale
+// the account uses (mirrored already, if "5.00 is highest"); it's normalized back
+// to the 1.00-highest scale before comparing against the fixed thresholds.
+// Returns 'presidents', 'deans', or null (not within honors range / no grade yet).
+export function getHonorStatus(gwa, gradingSystem) {
+  if (gwa === null || gwa === undefined || isNaN(gwa)) return null;
+  const normalized = gradingSystem === 'highest-5' ? mirrorGrade(gwa) : gwa;
+  if (normalized >= PRESIDENTS_LISTER_RANGE.min && normalized < PRESIDENTS_LISTER_RANGE.max) return 'presidents';
+  if (normalized >= DEANS_LISTER_RANGE.min && normalized <= DEANS_LISTER_RANGE.max) return 'deans';
+  return null;
+}
+
 // Resolves a course's lifecycle status relative to the term(s) it's assigned to:
 // 'taken' (an ended term + passing grade), 'current' (a term is ongoing), 'not-yet' (only future terms), or null.
 // Scans every term the course appears in (not just the first match) so a course reused across

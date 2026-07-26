@@ -1,7 +1,7 @@
 import React from 'react';
-import { Inbox, BookOpen, Clock3, Video, TrendingUp, GraduationCap, Target } from 'lucide-react';
+import { Inbox, BookOpen, Clock3, Video, TrendingUp, GraduationCap, Target, Award } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { getCurrentTerm, timeToMinutes, computeGWA, computeTermStats, computeCumulativeStats, formatDate, formatTime, DAYS, isTermEnded, getEffectiveGrade, isPassingGrade } from '../utils';
+import { getCurrentTerm, timeToMinutes, computeGWA, computeTermStats, computeCumulativeStats, formatDate, formatTime, DAYS, isTermEnded, getEffectiveGrade, isPassingGrade, getHonorStatus } from '../utils';
 import { Eyebrow, EmptyState } from './SharedUI';
 
 function StatCard({ label, labelIcon: LabelIcon, sub, children }) {
@@ -66,6 +66,23 @@ export default function Dashboard({ data }) {
         return sum + (parseFloat(course.units) || 0);
       }, 0)
     : 0;
+
+  // Honors card: prefer the current term's live GWA if it has one yet; otherwise
+  // fall back to the most recently finished term (last entry in gwaHistory, which
+  // is sorted oldest -> newest).
+  let honorsTerm = null;
+  let honorsGWA = null;
+  let honorsIsCurrent = false;
+  if (currentTerm && termStats && termStats.gwa !== null) {
+    honorsTerm = currentTerm;
+    honorsGWA = termStats.gwa;
+    honorsIsCurrent = true;
+  } else if (gwaHistory.length > 0) {
+    const lastFinished = gwaHistory[gwaHistory.length - 1];
+    honorsTerm = lastFinished.term;
+    honorsGWA = lastFinished.gwa;
+  }
+  const honorStatus = getHonorStatus(honorsGWA, data.account.gradingSystem);
 
   let neededGrade = null;
   let neededStatus = null; // 'unreachable' | 'secured' | null
@@ -211,6 +228,27 @@ export default function Dashboard({ data }) {
               <>
                 <div className="gt-stat-value" style={{ color: 'var(--c-accent)' }}>{neededGrade.toFixed(2)}</div>
                 <div className="gt-stat-caption">average across {currentTermUnits} unit{currentTermUnits == 1 ? '' : 's'} to stay at {goalGWA.toFixed(2)}</div>
+              </>
+            )}
+          </StatCard>
+
+          <StatCard label="Honors Status" labelIcon={Award} sub={honorsTerm ? (honorsIsCurrent ? 'this term' : 'last finished term') : undefined}>
+            {!honorsTerm || honorsGWA === null ? (
+              <div className="gt-stat-empty">No term with a computed GWA yet.</div>
+            ) : honorStatus === 'presidents' ? (
+              <>
+                <div className="gt-serif" style={{ fontSize: 20, color: 'var(--c-forest)', marginTop: 4 }}>President's Lister</div>
+                <div className="gt-stat-caption">{honorsGWA.toFixed(2)} GWA in {honorsTerm.name}</div>
+              </>
+            ) : honorStatus === 'deans' ? (
+              <>
+                <div className="gt-serif" style={{ fontSize: 20, color: 'var(--c-accent)', marginTop: 4 }}>Dean's Lister</div>
+                <div className="gt-stat-caption">{honorsGWA.toFixed(2)} GWA in {honorsTerm.name}</div>
+              </>
+            ) : (
+              <>
+                <div className="gt-stat-value">{honorsGWA.toFixed(2)}</div>
+                <div className="gt-stat-caption">Outside honors range in {honorsTerm.name}</div>
               </>
             )}
           </StatCard>
