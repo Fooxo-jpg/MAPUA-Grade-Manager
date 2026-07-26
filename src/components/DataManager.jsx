@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { DownloadCloud, UploadCloud, FileText, AlertTriangle, Check, X, RefreshCw, LogOut, CloudOff, Trash2, Cloud } from 'lucide-react';
+import { DownloadCloud, UploadCloud, FileText, AlertTriangle, Check, X, RefreshCw, LogOut, CloudOff, Trash2, Cloud, FileSpreadsheet } from 'lucide-react';
 import { todayStr } from '../utils';
 import { Eyebrow, PrimaryButton, SecondaryButton, IconButton, SelectField } from './SharedUI';
 import AuthForm, { SupabaseNotConfiguredNotice } from './Auth';
 import { supabase } from '../supabaseClient';
+import CourseImport from './CourseImport';
 
 const AUTO_SAVE_OPTIONS = [
   { value: 0, label: 'No auto-save (manual only)' },
@@ -25,7 +26,7 @@ function timeAgo(date) {
 }
 
 export default function DataManager({
-  data, importData, updateAccount, resetAllData,
+  data, importData, importCourses, updateAccount, resetAllData,
   session, onSignedIn, userEmail, cloudStatus, cloudError, lastSyncedAt, syncNow, signOut,
 }) {
   const [confirmResetAll, setConfirmResetAll] = useState(false);
@@ -174,6 +175,21 @@ export default function DataManager({
             )}
           </>
         )}
+      </div>
+
+      <div className="gt-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <div style={{ width: 42, height: 42, borderRadius: 10, background: 'color-mix(in srgb, var(--c-accent) 12%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <FileSpreadsheet size={19} color="var(--c-accent-dark)" />
+          </div>
+          <div>
+            <div className="gt-serif" style={{ fontSize: 17, color: 'var(--c-ink-soft)' }}>Import Courses from CSV / Excel</div>
+            <div style={{ fontSize: 12.5, color: 'var(--c-text-faint)', marginTop: 3 }}>
+              Bulk-add your course catalog from a spreadsheet instead of entering each one by hand.
+            </div>
+          </div>
+        </div>
+        <CourseImport importCourses={importCourses} />
       </div>
 
       <div className="gt-data-cols">

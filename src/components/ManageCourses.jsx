@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, Plus, Check, X, Pencil, Trash2, Tag } from 'lucide-react';
 import { COURSE_TYPES, courseTypeColor, uid, getCourseStatus } from '../utils';
 import { Eyebrow, EmptyState, TextField, CoursePicker, PrimaryButton, IconButton } from './SharedUI';
+import { registerNewItemHandler, unregisterNewItemHandler } from '../shortcutRegistry';
 
 const STATUS_META = {
   taken: { label: 'Taken', color: 'var(--c-forest)', bg: 'color-mix(in srgb, var(--c-forest) 10%, transparent)' },
@@ -70,6 +71,14 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
 
   const canSubmit = form.code.trim() && form.name.trim();
 
+  useEffect(() => {
+    registerNewItemHandler('courses', () => {
+      setShowAddForm(true);
+      setTimeout(() => document.getElementById('new-course-code-field')?.focus(), 0);
+    });
+    return () => unregisterNewItemHandler('courses');
+  }, []);
+
   function submit() {
     if (!canSubmit) return;
     addCourse({ ...form, id: uid(), units: form.units || 0 });
@@ -116,7 +125,7 @@ export default function ManageCourses({ data, addCourse, updateCourse, deleteCou
             <IconButton icon={X} onClick={() => { setShowAddForm(false); setForm(blank); }} title="Cancel" />
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <TextField label="Code" value={form.code} onChange={v => setForm({ ...form, code: v })} placeholder="CS101" mono />
+            <TextField id="new-course-code-field" label="Code" value={form.code} onChange={v => setForm({ ...form, code: v })} placeholder="CS101" mono />
             <TextField label="Course Name" value={form.name} onChange={v => setForm({ ...form, name: v })} placeholder="Intro to Programming" />
             <TextField label="Units" value={form.units} onChange={v => setForm({ ...form, units: v.replace(/[^0-9.]/g, '') })} placeholder="3" mono />
             <TextField label="Instructor" value={form.instructor} onChange={v => setForm({ ...form, instructor: v })} placeholder="Optional" />

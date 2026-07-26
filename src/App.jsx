@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { STORAGE_KEY, defaultData, findCourseTermId, uid, SIDEBAR_THEMES } from './utils';
 import { supabase, GRADEBOOK_TABLE } from './supabaseClient';
+import { getNewItemHandler } from './shortcutRegistry';
 
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -136,6 +137,24 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [syncNow]);
 
+  // Global "create new" shortcut. Ctrl+N (Cmd+N on Mac) opens the relevant
+  // add form for whichever page is currently active — new course on Manage
+  // Courses, new assessment on Manage Grades, new time block on Manage
+  // Schedule, etc. Each page registers its own handler (see shortcutRegistry.js).
+  useEffect(() => {
+    function onKeyDown(e) {
+      const isNewShortcut = (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === 'n' || e.key === 'N');
+      if (!isNewShortcut) return;
+      const handler = getNewItemHandler(active);
+      if (handler) {
+        e.preventDefault();
+        handler();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [active]);
+
   const signOut = useCallback(async () => {
     if (dirtyRef.current) await syncNow();
     if (supabase) await supabase.auth.signOut();
@@ -165,6 +184,8 @@ export default function App() {
   }, [persist]);
 
   const addCourse = (course) => update(d => ({ ...d, courses: [...d.courses, course] }));
+  // Appends many courses at once (CSV/Excel bulk import) rather than one at a time.
+  const importCourses = (courses) => update(d => ({ ...d, courses: [...d.courses, ...courses] }));
   const updateCourse = (id, patch) => update(d => ({ ...d, courses: d.courses.map(c => c.id === id ? { ...c, ...patch } : c) }));
   const deleteCourse = (id) => update(d => {
     const termCourses = {};
@@ -320,6 +341,7 @@ export default function App() {
           <DataManager
             data={data}
             importData={importData}
+            importCourses={importCourses}
             updateAccount={updateAccount}
             resetAllData={resetAllData}
             session={session}

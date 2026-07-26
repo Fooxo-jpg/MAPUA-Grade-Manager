@@ -140,11 +140,13 @@ export function CoursePicker({ label, options, selectedIds, onToggle }) {
   );
 }
 
-export function TextField({ label, value, onChange, placeholder, type = 'text', mono = false, list, title }) {
+export function TextField({ label, value, onChange, placeholder, type = 'text', mono = false, list, title, id, autoFocus }) {
   return (
     <label className="gt-field">
       <span className="gt-field-label">{label}</span>
       <input
+        id={id}
+        autoFocus={autoFocus}
         type={type}
         value={value}
         placeholder={placeholder}

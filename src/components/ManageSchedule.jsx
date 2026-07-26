@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Clock3, BookOpen, Settings, X, Video, Plus, Check, Trash2, Pencil, AlertCircle } from 'lucide-react';
-import { getCurrentTerm, timeToMinutes, formatTime, uid, DAYS, COURSE_COLORS } from '../utils';
+import { Clock3, BookOpen, Settings, X, Video, Plus, Check, Trash2, Pencil, AlertCircle, AlertTriangle } from 'lucide-react';
+import { getCurrentTerm, timeToMinutes, timeRangesOverlap, formatTime, uid, DAYS, COURSE_COLORS, findScheduleConflicts } from '../utils';
 import { Eyebrow, EmptyState, PrimaryButton, IconButton, TextField, ColorSwatchPicker } from './SharedUI';
+import { registerNewItemHandler, unregisterNewItemHandler } from '../shortcutRegistry';
 
 function ScheduleGrid({ entries, courses }) {
   const startHour = 7, endHour = 21;
@@ -228,6 +229,11 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
     setCourseId(cid => termCourses.find(c => c.id === cid) ? cid : (termCourses[0] ? termCourses[0].id : ''));
   }, [currentTerm, termCourses]);
 
+  useEffect(() => {
+    registerNewItemHandler('schedule', () => setShowForm(true));
+    return () => unregisterNewItemHandler('schedule');
+  }, []);
+
   function updateBlock(key, patch) {
     setBlocks(bs => bs.map(b => {
       if (b.key !== key) return b;
@@ -253,6 +259,23 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
   const invalidBlocks = blocksWithDays.filter(b => timeRangeError(b.startTime, b.endTime));
   const validBlocks = blocksWithDays.filter(b => !timeRangeError(b.startTime, b.endTime));
   const canSubmit = !!courseId && validBlocks.length > 0 && invalidBlocks.length === 0 && !!currentTerm;
+
+  // Flags time slots that overlap something already on the schedule — either an
+  // existing entry (any course) or another time block being added in this same
+  // submission. Conflicts are a warning, not a hard block: some schedules do
+  // legitimately overlap (e.g. an optional consult hour), so the user can still
+  // proceed, just with a clear "Add Anyway" confirmation instead of a silent add.
+  function blockConflicts(b) {
+    if (b.days.length === 0 || timeRangeError(b.startTime, b.endTime)) return [];
+    const existing = findScheduleConflicts({ days: b.days, startTime: b.startTime, endTime: b.endTime, entries, courses: data.courses });
+    const withinSubmission = blocks
+      .filter(other => other.key !== b.key && other.days.length > 0 && !timeRangeError(other.startTime, other.endTime))
+      .flatMap(other => other.days
+        .filter(day => b.days.includes(day) && timeRangesOverlap(b.startTime, b.endTime, other.startTime, other.endTime))
+        .map(day => ({ day, startTime: other.startTime, endTime: other.endTime, courseCode: null, courseName: 'another time you\'re adding above', room: other.room })));
+    return [...existing, ...withinSubmission];
+  }
+  const allConflicts = validBlocks.flatMap(blockConflicts);
 
   function submit() {
     if (!canSubmit) return;
@@ -344,6 +367,7 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
               {blocks.map((b, i) => {
                 const online = isOnlineRoom(b.room);
                 const timeError = timeRangeError(b.startTime, b.endTime);
+                const conflicts = blockConflicts(b);
                 return (
                   <div key={b.key} className="gt-card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -361,6 +385,15 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                     {timeError && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--c-danger)' }}>
                         <AlertCircle size={14} /> {timeError}
+                      </div>
+                    )}
+                    {conflicts.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 10px', borderRadius: 8, background: 'color-mix(in srgb, var(--c-danger) 8%, transparent)' }}>
+                        {conflicts.map((c, ci) => (
+                          <div key={ci} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--c-danger)' }}>
+                            <AlertTriangle size={13} /> Conflicts with {c.courseCode ? `${c.courseCode} (${c.courseName})` : c.courseName} on {c.day} {formatTime(c.startTime)}–{formatTime(c.endTime)}
+                          </div>
+                        ))}
                       </div>
                     )}
 
@@ -393,8 +426,15 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                 <PrimaryButton onClick={addBlock} icon={Plus} style={{ background: 'var(--c-surface)', color: 'var(--c-forest)', border: '1.5px solid var(--c-border-strong)' }}>
                   Add Another Time
                 </PrimaryButton>
-                <PrimaryButton onClick={submit} icon={Check} style={!canSubmit ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}>
-                  Add to Schedule
+                <PrimaryButton
+                  onClick={submit}
+                  icon={allConflicts.length > 0 ? AlertTriangle : Check}
+                  style={{
+                    ...(!canSubmit ? { opacity: 0.5, cursor: 'not-allowed' } : {}),
+                    ...(allConflicts.length > 0 ? { background: 'var(--c-danger)' } : {}),
+                  }}
+                >
+                  {allConflicts.length > 0 ? 'Add Anyway' : 'Add to Schedule'}
                 </PrimaryButton>
                 {invalidBlocks.length > 0 && (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--c-danger)' }}>
@@ -420,6 +460,9 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                   if (editingKey === g.key && editDraft) {
                     const editOnline = isOnlineRoom(editDraft.room);
                     const editTimeError = timeRangeError(editDraft.startTime, editDraft.endTime);
+                    const editConflicts = (editDraft.days.length > 0 && !editTimeError)
+                      ? findScheduleConflicts({ days: editDraft.days, startTime: editDraft.startTime, endTime: editDraft.endTime, entries, courses: data.courses, excludeGroupId: g.groupId })
+                      : [];
                     return (
                       <div key={g.key} className="gt-card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -435,6 +478,15 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                         {editTimeError && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--c-danger)' }}>
                             <AlertCircle size={14} /> {editTimeError}
+                          </div>
+                        )}
+                        {editConflicts.length > 0 && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 10px', borderRadius: 8, background: 'color-mix(in srgb, var(--c-danger) 8%, transparent)' }}>
+                            {editConflicts.map((c, i) => (
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--c-danger)' }}>
+                                <AlertTriangle size={13} /> Conflicts with {c.courseCode} ({c.courseName}) on {c.day} {formatTime(c.startTime)}–{formatTime(c.endTime)}
+                              </div>
+                            ))}
                           </div>
                         )}
 
@@ -463,10 +515,13 @@ export default function ManageSchedule({ data, addScheduleEntries, deleteSchedul
                         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                           <PrimaryButton
                             onClick={() => saveEdit(g)}
-                            icon={Check}
-                            style={(editDraft.days.length === 0 || editTimeError) ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+                            icon={editConflicts.length > 0 ? AlertTriangle : Check}
+                            style={{
+                              ...(editDraft.days.length === 0 || editTimeError ? { opacity: 0.5, cursor: 'not-allowed' } : {}),
+                              ...(editConflicts.length > 0 ? { background: 'var(--c-danger)' } : {}),
+                            }}
                           >
-                            Save Changes
+                            {editConflicts.length > 0 ? 'Save Anyway' : 'Save Changes'}
                           </PrimaryButton>
                           <PrimaryButton onClick={cancelEdit} style={{ background: 'var(--c-surface)', color: 'var(--c-text)', border: '1.5px solid var(--c-border-strong)' }}>
                             Cancel

@@ -311,6 +311,29 @@ export function timeToMinutes(t) {
   return h * 60 + m;
 }
 
+export function timeRangesOverlap(startA, endA, startB, endB) {
+  return timeToMinutes(startA) < timeToMinutes(endB) && timeToMinutes(endA) > timeToMinutes(startB);
+}
+
+// Finds existing schedule entries that overlap a candidate day+time range — used to
+// flag double-booked time slots while adding or editing schedule blocks. Pass
+// excludeGroupId when editing an existing block so it doesn't conflict with itself.
+export function findScheduleConflicts({ days, startTime, endTime, entries, courses, excludeGroupId }) {
+  const conflicts = [];
+  (entries || []).forEach(e => {
+    if (excludeGroupId && e.groupId && e.groupId === excludeGroupId) return;
+    if (!(days || []).includes(e.day)) return;
+    if (!startTime || !endTime || !e.startTime || !e.endTime) return;
+    if (!timeRangesOverlap(startTime, endTime, e.startTime, e.endTime)) return;
+    const course = (courses || []).find(c => c.id === e.courseId);
+    conflicts.push({
+      day: e.day, startTime: e.startTime, endTime: e.endTime,
+      courseCode: course ? course.code : '?', courseName: course ? course.name : 'Unknown course', room: e.room,
+    });
+  });
+  return conflicts;
+}
+
 export function formatTime(t) {
   if (!t) return '';
   const [h, m] = t.split(':').map(Number);
@@ -375,6 +398,28 @@ export function generateTerms({ startDate, years, termsPerYear }) {
     terms.push({ id: uid(), name, startDate: toISODate(termStart), endDate: toISODate(termEnd) });
   }
   return terms;
+}
+
+// The lowest percent a student can set as a grade goal — 69.99% is still a
+// passing score on the standard scale, so 69.00 is the practical floor.
+export const MIN_GOAL_PERCENT = 69.00;
+
+// Whether the course's current computed result meets its grade goal.
+// Returns true/false, or null if there isn't enough data yet to tell
+// (no assessments logged, or no goal set).
+export function isGradeGoalMet(percent, gradePoint, goal, account) {
+  if (!goal) return null;
+  if (goal.type === 'percent') {
+    if (percent === null || percent === undefined) return null;
+    return percent >= goal.value;
+  }
+  if (goal.type === 'grade') {
+    if (gradePoint === null || gradePoint === undefined || isNaN(gradePoint)) return null;
+    const highestIsOne = !account || account.gradingSystem !== 'highest-5';
+    // Lower is better on the 1.00-highest scale, higher is better when mirrored.
+    return highestIsOne ? gradePoint <= goal.value : gradePoint >= goal.value;
+  }
+  return null;
 }
 
 export function percentToGradePoint(gradeTable, percent) {
